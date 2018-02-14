@@ -1,112 +1,271 @@
-# RDF String
+# RDF Terms
 
-[![Build Status](https://travis-ci.org/rubensworks/rdf-string.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-string.js)
-[![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-string.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-string.js?branch=master)
-[![npm version](https://badge.fury.io/js/rdf-string.svg)](https://www.npmjs.com/package/rdf-string)
+[![Build Status](https://travis-ci.org/rubensworks/rdf-terms.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-terms.js)
+[![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-terms.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-terms.js?branch=master)
+[![npm version](https://badge.fury.io/js/rdf-terms.svg)](https://www.npmjs.com/package/rdf-terms)
 
-This package contains utility functions to convert between the string-based
-and [RDFJS](https://github.com/rdfjs/representation-task-force/) representations of RDF terms, quads and triples.
-
-This allows for convenient and compact interaction with RDF terms and quads.
-
-This string-based representation is based on the
-[triple representation of N3.js](https://github.com/RubenVerborgh/N3.js#triple-representation). 
+This package contains utility functions for handling
+[RDFJS](https://github.com/rdfjs/representation-task-force/) terms of quads/triples. 
 
 ## Usage
 
 The following examples assume the following imports:
 ```javascript
 import * as RdfDataModel from "rdf-data-model";
-import * as RdfTerm from "rdf-string";
+import * as RdfTerms from "rdf-terms";
 ```
 
-### Term to string
-
-Convert an RDFJS term to the string-based representation.
+### Constants
 
 ```javascript
-// Prints http://example.org
-console.log(RdfTerm.termToString(RdfDataModel.namedNode('http://example.org')));
+// Prints [ 'subject', 'predicate', 'object', 'graph' ]
+console.log(RdfTerms.QUAD_TERM_NAMES);
 
-// Prints _:b1
-console.log(RdfTerm.termToString(RdfDataModel.blankNode('b1')));
+// Prints [ 'subject', 'predicate', 'object' ]
+console.log(RdfTerms.TRIPLE_TERM_NAMES);
 
-// Prints "abc"
-console.log(RdfTerm.termToString(RdfDataModel.literal('abc')));
-
-// Prints "abc"@en-us
-console.log(RdfTerm.termToString(RdfDataModel.literal('abc', 'en-us')));
-
-// Prints "abc"^^http://example.org/
-console.log(RdfTerm.termToString(RdfDataModel.literal('abc', namedNode('http://example.org/'))));
-
-// Prints ?v1
-console.log(RdfTerm.termToString(RdfDataModel.variable('v1')));
-
-// Prints empty string
-console.log(RdfTerm.termToString(RdfDataModel.defaultGraph()));
+// Prints [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'DefaultGraph' ]
+console.log(RdfTerms.TERM_TYPES);
 ```
 
-### String to term
+### Get quad terms
 
-Convert an string-based term to the RDFJS representation.
+Get all terms from a quad.
 
-_Optionally, a custom RDFJS DataFactory can be provided as second argument to create terms instead of the built-in DataFactory._
-
-```javascript
-// Outputs a named node
-RdfTerm.stringToTerm('http://example.org');
-
-// Outputs a blank node
-RdfTerm.stringToTerm('_:b1');
-
-// Outputs a literal
-RdfTerm.stringToTerm('"abc"');
-
-// Outputs a literal with a language tag
-RdfTerm.stringToTerm('"abc"@en-us');
-
-// Outputs a literal with a datatype
-RdfTerm.stringToTerm('"abc"^^http://example.org/');
-
-// Outputs a variable
-RdfTerm.stringToTerm('?v1');
-
-// Outputs a default graph
-RdfTerm.stringToTerm('');
-```
-
-### Quad to string-based quad
-
-Convert an RDFJS quad to a string-based quad.
+_A second optional parameter can be set to true to ignore graph terms in the default graph._
 
 ```javascript
-// Prints { subject: 'http://example.org', predicate: 'http://example.org', object: '"abc"', graph: '' }
-console.log(RdfTerm.quadToStringQuad(RdfDataModel.triple(
-  namedNode('http://example.org'),
-  namedNode('http://example.org'),
+// Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g') ]
+RdfTerms.getTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
   literal('abc'),
-)));
+  namedNode('http://example.org/g'),
+));
+
+// Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), defaultGraph() ]
+RdfTerms.getTerms(RdfDataModel.triple(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+));
+
+// Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc') ]
+RdfTerms.getTerms(RdfDataModel.triple(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+), true);
 ```
 
-### String-based quad to quad
+### Get named quad terms
 
-Converts a string-based quad to an RDFJS quad.
+Get all terms from a quad labelled with the quad term name.
 
-_Optionally, a custom RDFJS DataFactory can be provided as second argument to create quads and terms instead of the built-in DataFactory._
+This is the reverse operation from `collectNamedTerms`.
 
 ```javascript
-// Outputs a quad
-RdfTerm.stringQuadToQuad({
-  subject: 'http://example.org',
-  predicate: 'http://example.org',
-  object: '"abc"',
-  graph: '',
-});
+// Outputs: [ { subject: namedNode('http://example.org/s') }, { predicate: namedNode('http://example.org/p') }, { object: literal('abc') }, { graph: namedNode('http://example.org/g') } ]
+RdfTerms.getNamedTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+));
+```
+
+### Collect named quad terms
+
+Create a quad from a an array of named quad terms.
+
+This is the reverse operation from `getNamedTerms`.
+
+_An optional callback method can be provided to fill in missing terms_
+
+```javascript
+// Outputs: quad(namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g'))
+RdfTerms.collectNamedTerms([
+  { subject: RdfDataModel.namedNode('http://example.org/s') },
+  { predicate: RdfDataModel.namedNode('http://example.org/p') },
+  { object: RdfDataModel.literal('abc') },
+  { graph: RdfDataModel.namedNode('http://example.org/g') },
+]);
+
+// Outputs: quad(namedNode('http://example.org/s'), namedNode('http://example.org/newNode'), literal('abc'), namedNode('http://example.org/g'))
+RdfTerms.collectNamedTerms([
+  { subject: RdfDataModel.namedNode('http://example.org/s') },
+  // Missing predicate
+  { object: RdfDataModel.literal('abc') },
+  { graph: RdfDataModel.namedNode('http://example.org/g') },
+], (termName) => RdfDataModel.namedNode('http://example.org/newNode'));
+```
+
+### Iterate over quad terms
+
+Invokes a callback for each term in the quad.
+
+```javascript
+// Outputs:
+// subject: http://example.org/s
+// predicate: http://example.org/p
+// object: abc
+// graph: http://example.org/g
+RdfTerms.forEachTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => console.log(key + ': ' + value.value));
+```
+
+### Filter quad terms
+
+Returns all quad terms that return true for a given filter.
+
+```javascript
+// Output: [namedNode('http://example.org/p')]
+RdfTerms.filterTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => key === 'predicate');
+```
+
+### Filter quad term names
+
+Returns all quad term names that return true for a given filter.
+
+```javascript
+// Output: ['predicate']
+RdfTerms.filterQuadTermNames(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.equals(namedNode('http://example.org/p')));
+```
+
+### Map quad terms
+
+Map all quad terms to form a new quad.
+
+```javascript
+// Output: quad(namedNode('http://subject'), namedNode('http://predicate'), namedNode('http://object'), namedNode('http://graph'))
+RdfTerms.mapQuadTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => namedNode('http://' + key));
+```
+
+### Reduce quad terms
+
+Reduce the quad terms to a single value.
+
+```javascript
+// Output: "START: http://example.org/s, http://example.org/p, abc, http://example.org/g"
+RdfTerms.reduceTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (previous, value, key) => previous + ', ' + value.value, 'START: ');
+```
+
+### Every quad terms
+
+Determines whether all terms satisfy the specified test.
+
+```javascript
+// Output: false
+RdfTerms.everyTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.termType === 'NamedNode');
+
+// Output: true
+RdfTerms.everyTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  namedNode('http://example.org/o'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.termType === 'NamedNode');
+```
+
+### Some quad terms
+
+Determines whether at least one term satisfies the specified test.
+
+```javascript
+// Output: true
+RdfTerms.someTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.termType === 'NamedNode');
+
+// Output: true
+RdfTerms.someTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  namedNode('http://example.org/o'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.termType === 'NamedNode');
+
+// Output: false
+RdfTerms.someTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  namedNode('http://example.org/o'),
+  namedNode('http://example.org/g'),
+), (value, key) => value.termType === 'Variable');
+```
+
+### Unique terms
+
+Create an array of unique terms from the given array.
+
+```javascript
+// Output: [namedNode('http://example.org/s')]
+RdfTerms.uniqTerms([
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/s'),
+]);
+```
+
+### Get terms of type
+
+Find all terms of the given type in the given array.
+
+```javascript
+// Output: [namedNode('http://example.org/s'), namedNode('http://example.org/p'), namedNode('http://example.org/g')]
+RdfTerms.getTermsOfType([
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+], 'NamedNode');
+```
+
+_The functions `getNamedNodes`, `getBlankNodes`, `getLiterals`, `getVariables`, `getDefaultGraphs` are convenience variants of this function,
+which do not require the term type string as parameter, and perform appropriate casting in TypeScript._
+
+```javascript
+// Output: [namedNode('http://example.org/s'), namedNode('http://example.org/p'), namedNode('http://example.org/g')]
+RdfTerms.getNamedNodes([
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+]);
 ```
 
 ## License
 This software is written by [Ruben Taelman](http://rubensworks.net/).
-These utility functions are inspired by the implementation of [N3.js](https://github.com/RubenVerborgh/N3.js).
 
 This code is released under the [MIT license](http://opensource.org/licenses/MIT).
