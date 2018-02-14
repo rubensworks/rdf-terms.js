@@ -17,6 +17,12 @@ export type QuadTermName = 'subject' | 'predicate' | 'object' | 'graph';
 export const QUAD_TERM_NAMES: QuadTermName[] = ['subject', 'predicate', 'object', 'graph'];
 
 /**
+ * All available triple term names.
+ * @type {[string , string , string]}
+ */
+export const TRIPLE_TERM_NAMES: QuadTermName[] = ['subject', 'predicate', 'object'];
+
+/**
  * An RDFJS term with a quad term name key.
  */
 export interface INamedTerm {
