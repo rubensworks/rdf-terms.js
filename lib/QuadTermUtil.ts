@@ -128,14 +128,17 @@ export function filterQuadTermNames(quad: RDF.Quad,
 /**
  * Map all terms of a quad.
  * @param {Quad} quad An RDFJS quad.
- * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => Term} mapper A mapper function.
+ * @param {(value: Term, key: QuadTermName) => Term} mapper A mapper function.
  * @return {Quad} A new RDFJS quad.
  */
-export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => RDF.Term)
+export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTermName) => RDF.Term)
 : RDF.Quad {
-  return collectNamedTerms(getNamedTerms(quad)
-    .map((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      ({ key: namedTerm.key, value: mapper(namedTerm.value, namedTerm.key, all) })));
+  return DataFactory.quad(
+    mapper(quad.subject, 'subject'),
+    mapper(quad.predicate, 'predicate'),
+    mapper(quad.object, 'object'),
+    mapper(quad.graph, 'graph'),
+  );
 }
 
 /**
