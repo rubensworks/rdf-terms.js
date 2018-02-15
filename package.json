@@ -1,6 +1,6 @@
 {
   "name": "rdf-terms",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Convenience functions for handling RDFJS terms",
   "keywords": [
     "rdf",
