@@ -12,6 +12,7 @@ import {
   QuadTermName,
   reduceTerms,
   someTerms,
+  TRIPLE_TERM_NAMES,
 } from './lib/QuadTermUtil';
 import {
   getBlankNodes,
@@ -45,4 +46,5 @@ export {
   reduceTerms,
   everyTerms,
   someTerms,
+  TRIPLE_TERM_NAMES,
 };
