@@ -81,6 +81,24 @@ describe('QuadTermUtil', () => {
       ], () => null)).toEqual(quadNamedNodes);
     });
 
+    it('should create a quad from named terms with a callback for a missing subject', async () => {
+      return expect(QuadTermUtil.collectNamedTerms([
+        { key: 'predicate', value: namedNode('p') },
+        { key: 'object', value: namedNode('o') },
+        { key: 'graph', value: namedNode('g') },
+      ], (termName: QuadTermUtil.QuadTermName) => variable(termName)))
+        .toEqual(quad(namedNode('subject'), variable('p'), namedNode('o'), namedNode('g')));
+    });
+
+    it('should create a quad from named terms with a callback for a missing object', async () => {
+      return expect(QuadTermUtil.collectNamedTerms([
+        { key: 'subject', value: namedNode('s') },
+        { key: 'predicate', value: namedNode('p') },
+        { key: 'graph', value: namedNode('g') },
+      ], (termName: QuadTermUtil.QuadTermName) => variable(termName)))
+        .toEqual(quad(namedNode('s'), variable('p'), namedNode('object'), namedNode('g')));
+    });
+
     it('should create a quad from named terms with a callback for a missing predicate', async () => {
       return expect(QuadTermUtil.collectNamedTerms([
         { key: 'subject', value: namedNode('s') },
@@ -103,83 +121,27 @@ describe('QuadTermUtil', () => {
     it('should call a callback for each quad term', async () => {
       const values = [];
       const keys = [];
-      const alls = [];
-      const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName, all: QuadTermUtil.INamedTerm[]) => {
+      const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName) => {
         values.push(value);
         keys.push(key);
-        alls.push(all);
       });
       QuadTermUtil.forEachTerms(quadNamedNodes, cb);
       expect(cb).toHaveBeenCalledTimes(4);
       expect(values).toEqual([namedNode('s'), namedNode('p'), namedNode('o'), namedNode('g')]);
       expect(keys).toEqual(QuadTermUtil.QUAD_TERM_NAMES);
-      expect(alls).toEqual([
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: namedNode('g') },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: namedNode('g') },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: namedNode('g') },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: namedNode('g') },
-        ],
-      ]);
     });
 
     it('should call a callback for each triple term', async () => {
       const values = [];
       const keys = [];
-      const alls = [];
-      const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName, all: QuadTermUtil.INamedTerm[]) => {
+      const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName) => {
         values.push(value);
         keys.push(key);
-        alls.push(all);
       });
       QuadTermUtil.forEachTerms(tripleNamedNodes, cb);
       expect(cb).toHaveBeenCalledTimes(4);
       expect(values).toEqual([namedNode('s'), namedNode('p'), namedNode('o'), defaultGraph()]);
       expect(keys).toEqual(QuadTermUtil.QUAD_TERM_NAMES);
-      expect(alls).toEqual([
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: defaultGraph() },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: defaultGraph() },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: defaultGraph() },
-        ],
-        [
-          { key: 'subject', value: namedNode('s') },
-          { key: 'predicate', value: namedNode('p') },
-          { key: 'object', value: namedNode('o') },
-          { key: 'graph', value: defaultGraph() },
-        ],
-      ]);
     });
   });
 

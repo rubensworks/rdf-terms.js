@@ -45,11 +45,10 @@ export interface INamedTerm {
  * @return {Term[]} The available terms in the quad.
  */
 export function getTerms(quad: RDF.Quad, ignoreDefaultGraph?: boolean): RDF.Term[] {
-  const terms: RDF.Term[] = QUAD_TERM_NAMES.map((key: string) => (<any> quad)[key]);
-  if (ignoreDefaultGraph && terms[3].termType === 'DefaultGraph') {
-    terms.splice(3, 1);
+  if (ignoreDefaultGraph && quad.graph.termType === 'DefaultGraph') {
+    return [ quad.subject, quad.predicate, quad.object ];
   }
-  return terms;
+  return [ quad.subject, quad.predicate, quad.object, quad.graph ];
 }
 
 /**
@@ -59,7 +58,12 @@ export function getTerms(quad: RDF.Quad, ignoreDefaultGraph?: boolean): RDF.Term
  * @return {INamedTerm[]} An array of named terms.
  */
 export function getNamedTerms(quad: RDF.Quad): INamedTerm[] {
-  return QUAD_TERM_NAMES.map((key: QuadTermName) => ({ key, value: (<any> quad)[key] }));
+  return [
+    { key: 'subject',   value: quad.subject },
+    { key: 'predicate', value: quad.predicate },
+    { key: 'object',    value: quad.object },
+    { key: 'graph',     value: quad.graph },
+  ];
 }
 
 /**
@@ -75,11 +79,10 @@ export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termNam
   const elements: {[id: string]: RDF.Term} = {};
   namedTerms.forEach((namedTerm: INamedTerm) => elements[namedTerm.key] = namedTerm.value);
   if (defaultCb) {
-    QUAD_TERM_NAMES.forEach((termName: QuadTermName) => {
-      if (!elements[termName]) {
-        elements[termName] = defaultCb(termName);
-      }
-    });
+    elements.subject   = elements.subject   || defaultCb('subject');
+    elements.predicate = elements.predicate || defaultCb('predicate');
+    elements.object    = elements.object    || defaultCb('object');
+    elements.graph     = elements.graph     || defaultCb('graph');
   }
   return DataFactory.quad(elements.subject, elements.predicate, elements.object, elements.graph);
 }
@@ -87,27 +90,37 @@ export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termNam
 /**
  * Iterats over each term.
  * @param {Quad} quad An RDFJS quad.
- * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => void} cb A callback function.
+ * @param {(value: Term, key: QuadTermName} cb A callback function.
  */
 export function forEachTerms(quad: RDF.Quad,
-                             cb: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => void) {
-  return getNamedTerms(quad)
-    .forEach((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      cb(namedTerm.value, namedTerm.key, all));
+                             cb: (value: RDF.Term, key: QuadTermName) => void) {
+  cb(quad.subject,   'subject');
+  cb(quad.predicate, 'predicate');
+  cb(quad.object,    'object');
+  cb(quad.graph,     'graph');
 }
 
 /**
  * Get all terms in the given quad that return true on the given filter function.
  * @param {Quad} quad A quad.
- * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => boolean} filter A filter callback.
+ * @param {(value: Term, key: QuadTermName) => boolean} filter A filter callback.
  * @return {Term[]} The list of matching terms.
  */
-export function filterTerms(quad: RDF.Quad, filter: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => boolean)
-: RDF.Term[] {
-  return getNamedTerms(quad)
-    .filter((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      filter(namedTerm.value, namedTerm.key, all))
-    .map((namedTerm: INamedTerm) => namedTerm.value);
+export function filterTerms(quad: RDF.Quad, filter: (value: RDF.Term, key: QuadTermName) => boolean): RDF.Term[] {
+  const terms: RDF.Term[] = [];
+  if (filter(quad.subject, 'subject')) {
+    terms.push(quad.subject);
+  }
+  if (filter(quad.predicate, 'predicate')) {
+    terms.push(quad.predicate);
+  }
+  if (filter(quad.object, 'object')) {
+    terms.push(quad.object);
+  }
+  if (filter(quad.graph, 'graph')) {
+    terms.push(quad.graph);
+  }
+  return terms;
 }
 
 /**
@@ -117,12 +130,21 @@ export function filterTerms(quad: RDF.Quad, filter: (value: RDF.Term, key: QuadT
  * @return {QuadTermName[]} The list of matching quad term names.
  */
 export function filterQuadTermNames(quad: RDF.Quad,
-                                    filter: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => boolean)
-: QuadTermName[] {
-  return getNamedTerms(quad)
-    .filter((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      filter(namedTerm.value, namedTerm.key, all))
-    .map((namedTerm: INamedTerm) => namedTerm.key);
+                                    filter: (value: RDF.Term, key: QuadTermName) => boolean): QuadTermName[] {
+  const names: QuadTermName[] = [];
+  if (filter(quad.subject, 'subject')) {
+    names.push('subject');
+  }
+  if (filter(quad.predicate, 'predicate')) {
+    names.push('predicate');
+  }
+  if (filter(quad.object, 'object')) {
+    names.push('object');
+  }
+  if (filter(quad.graph, 'graph')) {
+    names.push('graph');
+  }
+  return names;
 }
 
 /**
@@ -144,41 +166,44 @@ export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTerm
 /**
  * Reduce all terms of a quad.
  * @param {Quad} quad An RDFJS quad.
- * @param {(previousValue: U, currentValue: Term, key: QuadTermName, all: INamedTerm[]) => U} reducer A reduce function.
+ * @param {(previousValue: U, currentValue: Term, key: QuadTermName) => U} reducer A reduce function.
  * @param {U} initialValue The initial value.
  * @return {U} The final value.
  */
 export function reduceTerms<U>(quad: RDF.Quad,
-                               reducer: (previousValue: U, currentValue: RDF.Term, key: QuadTermName,
-                                         all: INamedTerm[]) => U,
+                               reducer: (previousValue: U, currentValue: RDF.Term, key: QuadTermName) => U,
                                initialValue: U): U {
-  return getNamedTerms(quad)
-    .reduce((previousValue: U, namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      reducer(previousValue, namedTerm.value, namedTerm.key, all), initialValue);
+  let value: U = initialValue;
+  value = reducer(value, quad.subject,   'subject');
+  value = reducer(value, quad.predicate, 'predicate');
+  value = reducer(value, quad.object,    'object');
+  return  reducer(value, quad.graph,     'graph');
 }
 
 /**
  * Determines whether all terms satisfy the specified test.
  * @param {Quad} quad An RDFJS quad.
- * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => boolean} checker A checker function.
+ * @param {(value: Term, key: QuadTermName} checker A checker function.
  * @return {boolean} If all terms satisfy the specified test.
  */
 export function everyTerms(quad: RDF.Quad,
-                           checker: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => boolean): boolean {
-  return getNamedTerms(quad)
-    .every((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      checker(namedTerm.value, namedTerm.key, all));
+                           checker: (value: RDF.Term, key: QuadTermName) => boolean): boolean {
+  return checker(quad.subject,   'subject')
+      && checker(quad.predicate, 'predicate')
+      && checker(quad.object,    'object')
+      && checker(quad.graph,     'graph');
 }
 
 /**
  * Determines whether at least one term satisfies the specified test.
  * @param {Quad} quad An RDFJS quad.
- * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => boolean} checker A checker function.
+ * @param {(value: Term, key: QuadTermName} checker A checker function.
  * @return {boolean} If at least one term satisfies the specified test.
  */
 export function someTerms(quad: RDF.Quad,
-                          checker: (value: RDF.Term, key: QuadTermName, all: INamedTerm[]) => boolean): boolean {
-  return getNamedTerms(quad)
-    .some((namedTerm: INamedTerm, i: number, all: INamedTerm[]) =>
-      checker(namedTerm.value, namedTerm.key, all));
+                          checker: (value: RDF.Term, key: QuadTermName) => boolean): boolean {
+  return checker(quad.subject,   'subject')
+      || checker(quad.predicate, 'predicate')
+      || checker(quad.object,    'object')
+      || checker(quad.graph,     'graph');
 }
