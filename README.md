@@ -152,7 +152,7 @@ Map all quad terms to form a new quad.
 
 ```javascript
 // Output: quad(namedNode('http://subject'), namedNode('http://predicate'), namedNode('http://object'), namedNode('http://graph'))
-RdfTerms.mapQuadTerms(RdfDataModel.quad(
+RdfTerms.mapTerms(RdfDataModel.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
