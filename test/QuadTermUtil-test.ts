@@ -1,4 +1,4 @@
-import {defaultGraph, namedNode, quad, triple, variable} from "rdf-data-model";
+import {defaultGraph, namedNode, quad, triple, variable} from "@rdfjs/data-model";
 import * as RDF from "rdf-js";
 import * as QuadTermUtil from "../lib/QuadTermUtil";
 

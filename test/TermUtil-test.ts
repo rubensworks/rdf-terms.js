@@ -1,4 +1,4 @@
-import {blankNode, defaultGraph, literal, namedNode, quad, triple, variable} from "rdf-data-model";
+import {blankNode, defaultGraph, literal, namedNode, quad, triple, variable} from "@rdfjs/data-model";
 import * as RDF from "rdf-js";
 import * as TermUtil from "../lib/TermUtil";
 
