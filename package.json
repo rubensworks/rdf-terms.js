@@ -31,10 +31,9 @@
   ],
   "dependencies": {
     "lodash.uniqwith": "^4.5.0",
-    "rdf-data-model": "^1.0.0"
+    "@rdfjs/data-model": "^1.1.0"
   },
   "devDependencies": {
-    "@types/rdf-data-model": "^1.0.1",
     "@types/rdf-js": "^1.0.1",
     "@types/jest": "^21.1.8",
     "coveralls": "^3.0.0",
