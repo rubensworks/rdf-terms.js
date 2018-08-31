@@ -80,7 +80,7 @@ Create a quad from a an array of named quad terms.
 
 This is the reverse operation from `getNamedTerms`.
 
-_An optional callback method can be provided to fill in missing terms_
+_An second optional callback method can be provided to fill in missing terms_
 
 ```javascript
 // Outputs: quad(namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g'))
@@ -98,6 +98,17 @@ RdfTerms.collectNamedTerms([
   { object: RdfDataModel.literal('abc') },
   { graph: RdfDataModel.namedNode('http://example.org/g') },
 ], (termName) => RdfDataModel.namedNode('http://example.org/newNode'));
+```
+
+_An third optional argument can be passed to set a custom data factory_
+
+```javascript
+RdfTerms.collectNamedTerms([
+  { subject: RdfDataModel.namedNode('http://example.org/s') },
+  { predicate: RdfDataModel.namedNode('http://example.org/p') },
+  { object: RdfDataModel.literal('abc') },
+  { graph: RdfDataModel.namedNode('http://example.org/g') },
+], null, myDataFactory);
 ```
 
 ### Iterate over quad terms
@@ -158,6 +169,20 @@ RdfTerms.mapTerms(RdfDataModel.quad(
   literal('abc'),
   namedNode('http://example.org/g'),
 ), (value, key) => namedNode('http://' + key));
+```
+
+_An second optional argument can be passed to set a custom data factory_
+
+```javascript
+// Output: quad(namedNode('http://subject'), namedNode('http://predicate'), namedNode('http://object'), namedNode('http://graph'))
+RdfTerms.mapTerms(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  (value, key) => namedNode('http://' + key),
+  myDataFactory);
 ```
 
 ### Reduce quad terms

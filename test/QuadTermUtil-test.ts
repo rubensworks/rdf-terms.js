@@ -1,4 +1,5 @@
 import {defaultGraph, namedNode, quad, triple, variable} from "@rdfjs/data-model";
+import * as DataFactory from "@rdfjs/data-model";
 import * as RDF from "rdf-js";
 import * as QuadTermUtil from "../lib/QuadTermUtil";
 
@@ -61,6 +62,15 @@ describe('QuadTermUtil', () => {
         { key: 'object', value: namedNode('o') },
         { key: 'graph', value: namedNode('g') },
       ])).toEqual(quadNamedNodes);
+    });
+
+    it('should create a quad from named terms with a custom data factory', async () => {
+      return expect(QuadTermUtil.collectNamedTerms([
+        { key: 'subject', value: namedNode('s') },
+        { key: 'predicate', value: namedNode('p') },
+        { key: 'object', value: namedNode('o') },
+        { key: 'graph', value: namedNode('g') },
+      ], null, DataFactory)).toEqual(quadNamedNodes);
     });
 
     it('should create a triple from named terms', async () => {
@@ -194,6 +204,11 @@ describe('QuadTermUtil', () => {
   describe('#mapTerms', () => {
     it('should map for an identity function', async () => {
       expect(QuadTermUtil.mapTerms(quadNamedNodes, (term: RDF.Term) => term))
+        .toEqual(quadNamedNodes);
+    });
+
+    it('should map for an identity function with a custom data factory', async () => {
+      expect(QuadTermUtil.mapTerms(quadNamedNodes, (term: RDF.Term) => term, DataFactory))
         .toEqual(quadNamedNodes);
     });
 

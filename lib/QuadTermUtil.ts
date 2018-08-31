@@ -72,10 +72,11 @@ export function getNamedTerms(quad: RDF.Quad): INamedTerm[] {
  * @param {INamedTerm[]} namedTerms An array of named terms.
  * @param {(termName: QuadTermName) => Term} defaultCb An optional callback for when
  *                                                     certain terms are not available in the array.
+ * @param {RDF.DataFactory} dataFactory A custom data factory to create quads.
  * @return {Quad} The resulting RDFJS quad.
  */
-export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term)
-: RDF.Quad {
+export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term,
+                                  dataFactory?: RDF.DataFactory): RDF.Quad {
   const elements: {[id: string]: RDF.Term} = {};
   namedTerms.forEach((namedTerm: INamedTerm) => elements[namedTerm.key] = namedTerm.value);
   if (defaultCb) {
@@ -84,7 +85,7 @@ export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termNam
     elements.object    = elements.object    || defaultCb('object');
     elements.graph     = elements.graph     || defaultCb('graph');
   }
-  return DataFactory.quad(elements.subject, elements.predicate, elements.object, elements.graph);
+  return (dataFactory || DataFactory).quad(elements.subject, elements.predicate, elements.object, elements.graph);
 }
 
 /**
@@ -151,11 +152,12 @@ export function filterQuadTermNames(quad: RDF.Quad,
  * Map all terms of a quad.
  * @param {Quad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName) => Term} mapper A mapper function.
+ * @param {RDF.DataFactory} dataFactory A custom data factory to create quads.
  * @return {Quad} A new RDFJS quad.
  */
-export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTermName) => RDF.Term)
-: RDF.Quad {
-  return DataFactory.quad(
+export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTermName) => RDF.Term,
+                         dataFactory?: RDF.DataFactory): RDF.Quad {
+  return (dataFactory || DataFactory).quad(
     mapper(quad.subject, 'subject'),
     mapper(quad.predicate, 'predicate'),
     mapper(quad.object, 'object'),
