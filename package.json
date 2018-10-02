@@ -30,15 +30,19 @@
     "test"
   ],
   "dependencies": {
-    "lodash.uniqwith": "^4.5.0",
-    "@rdfjs/data-model": "^1.1.0"
+    "@rdfjs/data-model": "^1.1.0",
+    "lodash.uniqwith": "^4.5.0"
   },
   "devDependencies": {
-    "@types/rdf-js": "^1.0.1",
     "@types/jest": "^23.3.0",
+    "@types/rdf-js": "^1.0.1",
     "coveralls": "^3.0.0",
     "jest": "^23.4.1",
     "pre-commit": "^1.2.2",
+    "stryker": "^0.29.4",
+    "stryker-api": "^0.21.1",
+    "stryker-jest-runner": "^1.2.1",
+    "stryker-typescript": "^0.14.0",
     "ts-jest": "^23.10.0",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^5.3.1",
@@ -66,6 +70,7 @@
   },
   "scripts": {
     "test": "jest ${1}",
+    "test-mutation": "stryker run",
     "test-watch": "jest ${1} --watch",
     "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
     "lint": "tslint index.ts lib/**/*.ts test/**/*.ts --exclude '**/*.d.ts'",
