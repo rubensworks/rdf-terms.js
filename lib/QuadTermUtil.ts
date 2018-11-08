@@ -38,13 +38,13 @@ export interface INamedTerm {
 
 /**
  * Get all terms in the given quad.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @param {boolean} ignoreDefaultGraph If true and the quad has the default graph as graph,
  *                                     this term will not be returned in the array.
  *                                     (default: false)
  * @return {Term[]} The available terms in the quad.
  */
-export function getTerms(quad: RDF.Quad, ignoreDefaultGraph?: boolean): RDF.Term[] {
+export function getTerms(quad: RDF.BaseQuad, ignoreDefaultGraph?: boolean): RDF.Term[] {
   if (ignoreDefaultGraph && quad.graph.termType === 'DefaultGraph') {
     return [ quad.subject, quad.predicate, quad.object ];
   }
@@ -54,10 +54,10 @@ export function getTerms(quad: RDF.Quad, ignoreDefaultGraph?: boolean): RDF.Term
 /**
  * Convert the given quad to an array of named terms.
  * This is the reverse operation of {@link collectNamedTerms}.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @return {INamedTerm[]} An array of named terms.
  */
-export function getNamedTerms(quad: RDF.Quad): INamedTerm[] {
+export function getNamedTerms(quad: RDF.BaseQuad): INamedTerm[] {
   return [
     { key: 'subject',   value: quad.subject },
     { key: 'predicate', value: quad.predicate },
@@ -73,10 +73,11 @@ export function getNamedTerms(quad: RDF.Quad): INamedTerm[] {
  * @param {(termName: QuadTermName) => Term} defaultCb An optional callback for when
  *                                                     certain terms are not available in the array.
  * @param {RDF.DataFactory} dataFactory A custom data factory to create quads.
- * @return {Quad} The resulting RDFJS quad.
+ * @return {Q} The resulting RDFJS quad.
+ * @template Q The type of quad to output, defaults to RDF.Quad.
  */
-export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term,
-                                  dataFactory?: RDF.DataFactory): RDF.Quad {
+export function collectNamedTerms<Q extends RDF.BaseQuad = RDF.Quad>(
+  namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term, dataFactory?: RDF.DataFactory): Q {
   const elements: {[id: string]: RDF.Term} = {};
   namedTerms.forEach((namedTerm: INamedTerm) => elements[namedTerm.key] = namedTerm.value);
   if (defaultCb) {
@@ -85,15 +86,16 @@ export function collectNamedTerms(namedTerms: INamedTerm[], defaultCb?: (termNam
     elements.object    = elements.object    || defaultCb('object');
     elements.graph     = elements.graph     || defaultCb('graph');
   }
-  return (dataFactory || DataFactory).quad(elements.subject, elements.predicate, elements.object, elements.graph);
+  return (dataFactory || DataFactory).quad<Q>(
+    elements.subject, elements.predicate, elements.object, elements.graph);
 }
 
 /**
  * Iterats over each term.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} cb A callback function.
  */
-export function forEachTerms(quad: RDF.Quad,
+export function forEachTerms(quad: RDF.BaseQuad,
                              cb: (value: RDF.Term, key: QuadTermName) => void) {
   cb(quad.subject,   'subject');
   cb(quad.predicate, 'predicate');
@@ -103,11 +105,11 @@ export function forEachTerms(quad: RDF.Quad,
 
 /**
  * Get all terms in the given quad that return true on the given filter function.
- * @param {Quad} quad A quad.
+ * @param {BaseQuad} quad A quad.
  * @param {(value: Term, key: QuadTermName) => boolean} filter A filter callback.
  * @return {Term[]} The list of matching terms.
  */
-export function filterTerms(quad: RDF.Quad, filter: (value: RDF.Term, key: QuadTermName) => boolean): RDF.Term[] {
+export function filterTerms(quad: RDF.BaseQuad, filter: (value: RDF.Term, key: QuadTermName) => boolean): RDF.Term[] {
   const terms: RDF.Term[] = [];
   if (filter(quad.subject, 'subject')) {
     terms.push(quad.subject);
@@ -126,11 +128,11 @@ export function filterTerms(quad: RDF.Quad, filter: (value: RDF.Term, key: QuadT
 
 /**
  * Get all quad term names in the given quad that return true on the given filter function.
- * @param {Quad} quad A quad.
+ * @param {BaseQuad} quad A quad.
  * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => boolean} filter A filter callback.
  * @return {QuadTermName[]} The list of matching quad term names.
  */
-export function filterQuadTermNames(quad: RDF.Quad,
+export function filterQuadTermNames(quad: RDF.BaseQuad,
                                     filter: (value: RDF.Term, key: QuadTermName) => boolean): QuadTermName[] {
   const names: QuadTermName[] = [];
   if (filter(quad.subject, 'subject')) {
@@ -154,10 +156,12 @@ export function filterQuadTermNames(quad: RDF.Quad,
  * @param {(value: Term, key: QuadTermName) => Term} mapper A mapper function.
  * @param {RDF.DataFactory} dataFactory A custom data factory to create quads.
  * @return {Quad} A new RDFJS quad.
+ * @template Q The type of quad, defaults to RDF.Quad.
  */
-export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTermName) => RDF.Term,
-                         dataFactory?: RDF.DataFactory): RDF.Quad {
-  return (dataFactory || DataFactory).quad(
+export function mapTerms<Q extends RDF.BaseQuad = RDF.Quad>(quad: Q,
+                                                            mapper: (term: RDF.Term, key: QuadTermName) => RDF.Term,
+                                                            dataFactory?: RDF.DataFactory): Q {
+  return (dataFactory || DataFactory).quad<Q>(
     mapper(quad.subject, 'subject'),
     mapper(quad.predicate, 'predicate'),
     mapper(quad.object, 'object'),
@@ -167,12 +171,12 @@ export function mapTerms(quad: RDF.Quad, mapper: (value: RDF.Term, key: QuadTerm
 
 /**
  * Reduce all terms of a quad.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @param {(previousValue: U, currentValue: Term, key: QuadTermName) => U} reducer A reduce function.
  * @param {U} initialValue The initial value.
  * @return {U} The final value.
  */
-export function reduceTerms<U>(quad: RDF.Quad,
+export function reduceTerms<U>(quad: RDF.BaseQuad,
                                reducer: (previousValue: U, currentValue: RDF.Term, key: QuadTermName) => U,
                                initialValue: U): U {
   let value: U = initialValue;
@@ -184,11 +188,11 @@ export function reduceTerms<U>(quad: RDF.Quad,
 
 /**
  * Determines whether all terms satisfy the specified test.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} checker A checker function.
  * @return {boolean} If all terms satisfy the specified test.
  */
-export function everyTerms(quad: RDF.Quad,
+export function everyTerms(quad: RDF.BaseQuad,
                            checker: (value: RDF.Term, key: QuadTermName) => boolean): boolean {
   return checker(quad.subject,   'subject')
       && checker(quad.predicate, 'predicate')
@@ -198,11 +202,11 @@ export function everyTerms(quad: RDF.Quad,
 
 /**
  * Determines whether at least one term satisfies the specified test.
- * @param {Quad} quad An RDFJS quad.
+ * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} checker A checker function.
  * @return {boolean} If at least one term satisfies the specified test.
  */
-export function someTerms(quad: RDF.Quad,
+export function someTerms(quad: RDF.BaseQuad,
                           checker: (value: RDF.Term, key: QuadTermName) => boolean): boolean {
   return checker(quad.subject,   'subject')
       || checker(quad.predicate, 'predicate')
