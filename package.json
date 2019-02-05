@@ -34,7 +34,7 @@
     "lodash.uniqwith": "^4.5.0"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.0",
+    "@types/jest": "^24.0.0",
     "coveralls": "^3.0.0",
     "jest": "^23.4.1",
     "manual-git-changelog": "^1.0.0",
