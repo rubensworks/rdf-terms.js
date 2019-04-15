@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.5.0"></a>
+## [v1.5.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.4.0...v1.5.0) - 2019-04-15
+
+### Added
+* [Add functions to match quad patterns](https://github.com/rubensworks/rdf-terms.js/commit/dc129a81a16a31aa653efee97e2318d763c37874)
+
 <a name="v1.4.0"></a>
 ## [v1.4.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.3.0...v1.4.0) - 2018-11-08
 
