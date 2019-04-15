@@ -258,4 +258,184 @@ describe('QuadTermUtil', () => {
         (term: RDF.Term, key: QuadTermUtil.QuadTermName) => term.termType === 'NamedNode')).toBeTruthy();
     });
   });
+
+  describe('#matchPattern', () => {
+    const quadMatch = DataFactory.quad(
+      DataFactory.namedNode('subject'),
+      DataFactory.namedNode('predicate'),
+      DataFactory.namedNode('object'),
+      DataFactory.namedNode('graph'),
+    );
+
+    it('a quad and no terms', async () => {
+      expect(QuadTermUtil.matchPattern(quadMatch)).toBeTruthy();
+    });
+
+    it('a quad and subject term', async () => {
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        null)).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'))).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.blankNode('subject'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject-fail'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.variable('varS'))).toBeTruthy();
+    });
+
+    it('a quad and subject and predicate term', async () => {
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), null)).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'))).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.blankNode('predicate'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate-fail'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.variable('varP'))).toBeTruthy();
+    });
+
+    it('a quad and subject, predicate and object term', async () => {
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        null)).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'))).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.blankNode('object'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object-fail'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.variable('varO'))).toBeTruthy();
+    });
+
+    it('a quad and subject, predicate, object and graph term', async () => {
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'), null)).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'), DataFactory.namedNode('graph'))).toBeTruthy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'), DataFactory.blankNode('graph'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'), DataFactory.namedNode('graph-fail'))).toBeFalsy();
+      expect(QuadTermUtil.matchPattern(quadMatch,
+        DataFactory.namedNode('subject'), DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'), DataFactory.variable('varG'))).toBeTruthy();
+    });
+  });
+
+  describe('#matchPatternComplete', () => {
+    const quadMatch = DataFactory.quad(
+      DataFactory.namedNode('subject'),
+      DataFactory.namedNode('predicate'),
+      DataFactory.namedNode('object'),
+      DataFactory.namedNode('graph'),
+    );
+
+    it('a quad without variables', async () => {
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subjectF'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicateF'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('objectF'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graphF'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.blankNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.blankNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.blankNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeFalsy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.blankNode('graph'),
+      ))).toBeFalsy();
+    });
+
+    it('a quad with variables', async () => {
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.variable('var'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.variable('var'),
+        DataFactory.namedNode('object'),
+        DataFactory.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.variable('var'),
+        DataFactory.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.namedNode('subject'),
+        DataFactory.namedNode('predicate'),
+        DataFactory.namedNode('object'),
+        DataFactory.variable('var'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.variable('varS'),
+        DataFactory.variable('varP'),
+        DataFactory.variable('varO'),
+        DataFactory.variable('varG'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(quadMatch, DataFactory.quad(
+        DataFactory.variable('varS'),
+        DataFactory.variable('varP'),
+        DataFactory.namedNode('fail'),
+        DataFactory.variable('varG'),
+      ))).toBeFalsy();
+    });
+  });
 });

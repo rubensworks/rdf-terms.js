@@ -213,3 +213,41 @@ export function someTerms(quad: RDF.BaseQuad,
       || checker(quad.object,    'object')
       || checker(quad.graph,     'graph');
 }
+
+/**
+ * Check if the given quad matches with the given quad terms.
+ *
+ * Each term must match at least one of the following:
+ * * Term is undefined.
+ * * Term is a variable.
+ * * Quad term and term are equal (`quadTerm.equals(term)` return true)
+ *
+ * @param {BaseQuad} quad A quad to match with (can not contain variables).
+ * @param {Term} subject An optional subject.
+ * @param {Term} predicate An optional predicate.
+ * @param {Term} object An optional object.
+ * @param {Term} graph An optional graph.
+ * @return {boolean} If the quad matches with the quad terms.
+ */
+export function matchPattern(quad: RDF.BaseQuad, subject?: RDF.Term, predicate?: RDF.Term,
+                             object?: RDF.Term, graph?: RDF.Term): boolean {
+  return (!subject || subject.termType === 'Variable' || quad.subject.equals(subject))
+    && (!predicate || predicate.termType === 'Variable' || quad.predicate.equals(predicate))
+    && (!object || object.termType === 'Variable' || quad.object.equals(object))
+    && (!graph || graph.termType === 'Variable' || quad.graph.equals(graph));
+}
+
+/**
+ * Check if the first quad matches with all terms from the second quad.
+ *
+ * Each term must match at least one of the following:
+ * * Quad2 term is a variable.
+ * * Quad1 term and Quad2 term are equal (`term1.equals(term2)` return true)
+ *
+ * @param {BaseQuad} quad A quad (can not contain variables).
+ * @param {BaseQuad} pattern A quad pattern (can contain variables).
+ * @return {boolean} If the quad terms match.
+ */
+export function matchPatternComplete(quad: RDF.BaseQuad, pattern: RDF.BaseQuad): boolean {
+  return matchPattern(quad, pattern.subject, pattern.predicate, pattern.object, pattern.graph);
+}

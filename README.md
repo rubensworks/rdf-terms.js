@@ -6,7 +6,7 @@
 [![npm version](https://badge.fury.io/js/rdf-terms.svg)](https://www.npmjs.com/package/rdf-terms) [![Greenkeeper badge](https://badges.greenkeeper.io/rubensworks/rdf-terms.js.svg)](https://greenkeeper.io/)
 
 This package contains utility functions for handling
-[RDFJS](https://github.com/rdfjs/representation-task-force/) terms of quads/triples. 
+[RDFJS](https://github.com/rdfjs/representation-task-force/) terms of quads/triples.
 
 ## Usage
 
@@ -250,6 +250,105 @@ RdfTerms.someTerms(RdfDataModel.quad(
   namedNode('http://example.org/o'),
   namedNode('http://example.org/g'),
 ), (value, key) => value.termType === 'Variable');
+```
+
+### Match pattern
+
+Determines if the given quad matches with the given **quad terms**.
+
+```javascript
+// Output: true
+RdfTerms.matchPattern(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+);
+
+// Output: true
+RdfTerms.matchPattern(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+);
+
+// Output: true
+RdfTerms.matchPattern(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  namedNode('http://example.org/s'),
+  variable('someVariableP'),
+  literal('abc'),
+);
+
+// Output: false
+RdfTerms.matchPattern(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  namedNode('http://example.org/s'),
+  variable('someVariableP'),
+  literal('abcdef'),
+);
+```
+
+### Match pattern complete
+
+Determines if the given quad matches with the given **quad pattern** (_A quad that contains zero or more variables)_.
+
+```javascript
+// Output: true
+RdfTerms.matchPatternComplete(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+));
+
+// Output: true
+RdfTerms.matchPatternComplete(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  variable('varA'),
+  literal('abc'),
+  variable('varB'),
+));
+
+// Output: false
+RdfTerms.matchPatternComplete(RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), RdfDataModel.quad(
+  namedNode('http://example.org/s'),
+  variable('varA'),
+  literal('abcdef'),
+  variable('varB'),
+));
 ```
 
 ### Unique terms
