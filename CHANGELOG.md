@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.5.1"></a>
+## [v1.5.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.5.0...v1.5.1) - 2019-04-15
+
+### Fixed
+* [Fix new match pattern functions not being exported](https://github.com/rubensworks/rdf-terms.js/commit/9db5da034d22e50f58ce5ab12b5bce61aef30020)
+
 <a name="v1.5.0"></a>
 ## [v1.5.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.4.0...v1.5.0) - 2019-04-15
 
