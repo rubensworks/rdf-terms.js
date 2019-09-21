@@ -31,10 +31,12 @@
   ],
   "dependencies": {
     "@rdfjs/data-model": "^1.1.1",
+    "lodash": "^4.17.15",
     "lodash.uniqwith": "^4.5.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.0",
+    "@types/lodash": "^4.14.138",
     "coveralls": "^3.0.0",
     "jest": "^23.4.1",
     "manual-git-changelog": "^1.0.0",

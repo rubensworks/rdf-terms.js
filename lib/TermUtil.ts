@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as RDF from "rdf-js";
 
 /**
@@ -17,7 +18,7 @@ export const TERM_TYPES = [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'De
  * @return {T[]} A new array of unique RDFJS terms.
  */
 export function uniqTerms<T extends RDF.Term>(terms: T[]): T[] {
-  return require('lodash.uniqwith')(terms, (termA: RDF.Term, termB: RDF.Term) => termA.equals(termB));
+  return <T[]> _.uniqWith(terms, (termA: RDF.Term, termB: RDF.Term) => termA.equals(termB));
 }
 
 /**
