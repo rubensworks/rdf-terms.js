@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.6.0"></a>
+## [v1.6.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.5.1...v1.6.0) - 2020-09-02
+
+### Added
+* [Handle nested quads in utilities where applicable](https://github.com/rubensworks/rdf-terms.js/commit/4aca5bb185dde6cf8ddc85637a411f68ec1ea697)
+
+### Changed
+* [Migrate to rdf-data-factory with nested quad support](https://github.com/rubensworks/rdf-terms.js/commit/81c70f53f41c1993a9746b94e84a5ea52855c89d)
+
 <a name="v1.5.1"></a>
 ## [v1.5.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.5.0...v1.5.1) - 2019-04-15
 
