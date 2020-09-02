@@ -1,39 +1,41 @@
-import {blankNode, defaultGraph, literal, namedNode, quad, triple, variable} from "@rdfjs/data-model";
+import { DataFactory } from "rdf-data-factory";
 import * as RDF from "rdf-js";
 import * as TermUtil from "../lib/TermUtil";
+
+const DF = new DataFactory();
 
 describe('TermUtil', () => {
 
   const empty: RDF.Term[] = [];
   const single: RDF.Term[] = [
-    namedNode('a'),
+    DF.namedNode('a'),
   ];
   const double: RDF.Term[] = [
-    namedNode('a'),
-    namedNode('b'),
+    DF.namedNode('a'),
+    DF.namedNode('b'),
   ];
   const doubleEq: RDF.Term[] = [
-    namedNode('a'),
-    namedNode('a'),
+    DF.namedNode('a'),
+    DF.namedNode('a'),
   ];
   const equalValueMixedTypes: RDF.Term[] = [
-    namedNode('a'),
-    variable('a'),
-    blankNode('a'),
-    literal('a'),
-    defaultGraph(),
+    DF.namedNode('a'),
+    DF.variable('a'),
+    DF.blankNode('a'),
+    DF.literal('a'),
+    DF.defaultGraph(),
   ];
   const equalValueMixedTypesDuplicates: RDF.Term[] = [
-    variable('a'),
-    namedNode('a'),
-    variable('a'),
-    literal('a'),
-    defaultGraph(),
-    blankNode('a'),
-    namedNode('a'),
-    literal('a'),
-    defaultGraph(),
-    blankNode('a'),
+    DF.variable('a'),
+    DF.namedNode('a'),
+    DF.variable('a'),
+    DF.literal('a'),
+    DF.defaultGraph(),
+    DF.blankNode('a'),
+    DF.namedNode('a'),
+    DF.literal('a'),
+    DF.defaultGraph(),
+    DF.blankNode('a'),
   ];
 
   describe('#uniqTerms', () => {
@@ -52,22 +54,22 @@ describe('TermUtil', () => {
 
     it('should uniqify an array with two equal element', async () => {
       return expect(TermUtil.uniqTerms(doubleEq))
-        .toEqual([namedNode('a')]);
+        .toEqual([DF.namedNode('a')]);
     });
 
     it('should uniqify an array with two equal and one other element', async () => {
-      return expect(TermUtil.uniqTerms([namedNode('a'), namedNode('b'), namedNode('a')]))
-        .toEqual([namedNode('a'), namedNode('b')]);
+      return expect(TermUtil.uniqTerms([DF.namedNode('a'), DF.namedNode('b'), DF.namedNode('a')]))
+        .toEqual([DF.namedNode('a'), DF.namedNode('b')]);
     });
 
     it('should uniqify an array with mixed element types', async () => {
       return expect(TermUtil.uniqTerms(equalValueMixedTypesDuplicates))
         .toEqual([
-          variable('a'),
-          namedNode('a'),
-          literal('a'),
-          defaultGraph(),
-          blankNode('a'),
+          DF.variable('a'),
+          DF.namedNode('a'),
+          DF.literal('a'),
+          DF.defaultGraph(),
+          DF.blankNode('a'),
         ]);
     });
   });
@@ -79,37 +81,37 @@ describe('TermUtil', () => {
 
     it('should find named nodes', async () => {
       expect(TermUtil.getTermsOfType(single, 'NamedNode')).toEqual(single);
-      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'NamedNode')).toEqual([namedNode('a')]);
+      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'NamedNode')).toEqual([DF.namedNode('a')]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'NamedNode'))
-        .toEqual([namedNode('a'), namedNode('a')]);
+        .toEqual([DF.namedNode('a'), DF.namedNode('a')]);
     });
 
     it('should find blank nodes', async () => {
       expect(TermUtil.getTermsOfType(single, 'BlankNode')).toEqual([]);
-      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'BlankNode')).toEqual([blankNode('a')]);
+      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'BlankNode')).toEqual([DF.blankNode('a')]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'BlankNode'))
-        .toEqual([blankNode('a'), blankNode('a')]);
+        .toEqual([DF.blankNode('a'), DF.blankNode('a')]);
     });
 
     it('should find literals', async () => {
       expect(TermUtil.getTermsOfType(single, 'Literal')).toEqual([]);
-      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'Literal')).toEqual([literal('a')]);
+      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'Literal')).toEqual([DF.literal('a')]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'Literal'))
-        .toEqual([literal('a'), literal('a')]);
+        .toEqual([DF.literal('a'), DF.literal('a')]);
     });
 
     it('should find variables', async () => {
       expect(TermUtil.getTermsOfType(single, 'Variable')).toEqual([]);
-      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'Variable')).toEqual([variable('a')]);
+      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'Variable')).toEqual([DF.variable('a')]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'Variable'))
-        .toEqual([variable('a'), variable('a')]);
+        .toEqual([DF.variable('a'), DF.variable('a')]);
     });
 
     it('should find default graphs', async () => {
       expect(TermUtil.getTermsOfType(single, 'DefaultGraph')).toEqual([]);
-      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'DefaultGraph')).toEqual([defaultGraph()]);
+      expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'DefaultGraph')).toEqual([DF.defaultGraph()]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'DefaultGraph'))
-        .toEqual([defaultGraph(), defaultGraph()]);
+        .toEqual([DF.defaultGraph(), DF.defaultGraph()]);
     });
   });
 
@@ -120,9 +122,9 @@ describe('TermUtil', () => {
 
     it('should find named nodes', async () => {
       expect(TermUtil.getNamedNodes(single)).toEqual(single);
-      expect(TermUtil.getNamedNodes(equalValueMixedTypes)).toEqual([namedNode('a')]);
+      expect(TermUtil.getNamedNodes(equalValueMixedTypes)).toEqual([DF.namedNode('a')]);
       expect(TermUtil.getNamedNodes(equalValueMixedTypesDuplicates))
-        .toEqual([namedNode('a'), namedNode('a')]);
+        .toEqual([DF.namedNode('a'), DF.namedNode('a')]);
     });
   });
 
@@ -133,9 +135,9 @@ describe('TermUtil', () => {
 
     it('should find blank nodes', async () => {
       expect(TermUtil.getBlankNodes(single)).toEqual([]);
-      expect(TermUtil.getBlankNodes(equalValueMixedTypes)).toEqual([blankNode('a')]);
+      expect(TermUtil.getBlankNodes(equalValueMixedTypes)).toEqual([DF.blankNode('a')]);
       expect(TermUtil.getBlankNodes(equalValueMixedTypesDuplicates))
-        .toEqual([blankNode('a'), blankNode('a')]);
+        .toEqual([DF.blankNode('a'), DF.blankNode('a')]);
     });
   });
 
@@ -146,9 +148,9 @@ describe('TermUtil', () => {
 
     it('should find literals', async () => {
       expect(TermUtil.getLiterals(single)).toEqual([]);
-      expect(TermUtil.getLiterals(equalValueMixedTypes)).toEqual([literal('a')]);
+      expect(TermUtil.getLiterals(equalValueMixedTypes)).toEqual([DF.literal('a')]);
       expect(TermUtil.getLiterals(equalValueMixedTypesDuplicates))
-        .toEqual([literal('a'), literal('a')]);
+        .toEqual([DF.literal('a'), DF.literal('a')]);
     });
   });
 
@@ -159,16 +161,16 @@ describe('TermUtil', () => {
 
     it('should find variables', async () => {
       expect(TermUtil.getVariables(single)).toEqual([]);
-      expect(TermUtil.getVariables(equalValueMixedTypes)).toEqual([variable('a')]);
+      expect(TermUtil.getVariables(equalValueMixedTypes)).toEqual([DF.variable('a')]);
       expect(TermUtil.getVariables(equalValueMixedTypesDuplicates))
-        .toEqual([variable('a'), variable('a')]);
+        .toEqual([DF.variable('a'), DF.variable('a')]);
     });
 
     it('should find default graphs', async () => {
       expect(TermUtil.getDefaultGraphs(single)).toEqual([]);
-      expect(TermUtil.getDefaultGraphs(equalValueMixedTypes)).toEqual([defaultGraph()]);
+      expect(TermUtil.getDefaultGraphs(equalValueMixedTypes)).toEqual([DF.defaultGraph()]);
       expect(TermUtil.getDefaultGraphs(equalValueMixedTypesDuplicates))
-        .toEqual([defaultGraph(), defaultGraph()]);
+        .toEqual([DF.defaultGraph(), DF.defaultGraph()]);
     });
   });
 });

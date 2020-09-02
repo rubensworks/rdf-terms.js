@@ -427,13 +427,6 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@rdfjs/data-model@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@rdfjs/data-model/-/data-model-1.1.1.tgz#083737568e4a776a0fc7c718b4a4acdd287b78a7"
-  integrity sha512-4jb1zc77f27u/MLVhpE/zHR1uvdH4XElXG63rJP/kVnvKoHtVfyJSEqN9oRLANgqHJ9SNwKj9FXeNFZ4+GGfiw==
-  dependencies:
-    "@types/rdf-js" "^2.0.1"
-
 "@sinonjs/commons@^1.7.0":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.7.1.tgz#da5fd19a5f71177a53778073978873964f49acf1"
@@ -541,10 +534,10 @@
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.0.0.tgz#dc85454b953178cc6043df5208b9e949b54a3bc4"
   integrity sha512-/rM+sWiuOZ5dvuVzV37sUuklsbg+JPOP8d+nNFlo2ZtfpzPiPvh1/gc8liWOLBqe+sR+ZM7guPaIcTt6UZTo7Q==
 
-"@types/rdf-js@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-2.0.1.tgz#f07030a529ed1a8cd073098be961f2196d6ac0a9"
-  integrity sha512-x3Qct8TPilUos4znM1gANmtTvjOFdDRItmpEM2Nu9QgAx258FN9k22OvOu2TmPzOlx8a1FLdEW3o33UXHQt5ow==
+"@types/rdf-js@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-4.0.0.tgz#96f7314b09b77ecd16fca7f358db90db8ac86d1b"
+  integrity sha512-2uaR7ks0380MqzUWGOPOOk9yZIr/6MOaCcaj3ntKgd2PqNocgi8j5kSHIJTDe+5ABtTHqKMSE0v0UqrsT8ibgQ==
   dependencies:
     "@types/node" "*"
 
@@ -3682,6 +3675,13 @@ quick-lru@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/quick-lru/-/quick-lru-1.1.0.tgz#4360b17c61136ad38078397ff11416e186dcfbb8"
   integrity sha1-Q2CxfGETatOAeDl/8RQW4Ybc+7g=
+
+rdf-data-factory@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/rdf-data-factory/-/rdf-data-factory-1.0.1.tgz#60e84acae11135466fcb3f9176e3ff8ed6eb5a60"
+  integrity sha512-T8EJT4FqcQHRyLnb8erdmO7QXYhfO5YyklVbbaQkvdaGwmYB/4AcYJ0co6fBobcPDnYd2fJObSKP99+y8sGKiw==
+  dependencies:
+    "@types/rdf-js" "^4.0.0"
 
 react-is@^16.12.0:
   version "16.12.0"

@@ -1,5 +1,7 @@
-import * as DataFactory from "@rdfjs/data-model";
+import { DataFactory } from "rdf-data-factory";
 import * as RDF from "rdf-js";
+
+const DF = new DataFactory();
 
 /*
  * Utility methods for handling terms in RDFJS quads.
@@ -77,7 +79,7 @@ export function getNamedTerms(quad: RDF.BaseQuad): INamedTerm[] {
  * @template Q The type of quad to output, defaults to RDF.Quad.
  */
 export function collectNamedTerms<Q extends RDF.BaseQuad = RDF.Quad>(
-  namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term, dataFactory?: RDF.DataFactory): Q {
+  namedTerms: INamedTerm[], defaultCb?: (termName: QuadTermName) => RDF.Term, dataFactory?: RDF.DataFactory<Q>): Q {
   const elements: {[id: string]: RDF.Term} = {};
   namedTerms.forEach((namedTerm: INamedTerm) => elements[namedTerm.key] = namedTerm.value);
   if (defaultCb) {
@@ -86,7 +88,7 @@ export function collectNamedTerms<Q extends RDF.BaseQuad = RDF.Quad>(
     elements.object    = elements.object    || defaultCb('object');
     elements.graph     = elements.graph     || defaultCb('graph');
   }
-  return (dataFactory || DataFactory).quad<Q>(
+  return (dataFactory || <RDF.DataFactory<Q>> <any> DF).quad(
     elements.subject, elements.predicate, elements.object, elements.graph);
 }
 
@@ -160,8 +162,8 @@ export function filterQuadTermNames(quad: RDF.BaseQuad,
  */
 export function mapTerms<Q extends RDF.BaseQuad = RDF.Quad>(quad: Q,
                                                             mapper: (term: RDF.Term, key: QuadTermName) => RDF.Term,
-                                                            dataFactory?: RDF.DataFactory): Q {
-  return (dataFactory || DataFactory).quad<Q>(
+                                                            dataFactory?: RDF.DataFactory<Q>): Q {
+  return (dataFactory || <RDF.DataFactory<Q>> <any> DF).quad(
     mapper(quad.subject, 'subject'),
     mapper(quad.predicate, 'predicate'),
     mapper(quad.object, 'object'),
