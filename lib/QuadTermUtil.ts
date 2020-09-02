@@ -54,6 +54,26 @@ export function getTerms(quad: RDF.BaseQuad, ignoreDefaultGraph?: boolean): RDF.
 }
 
 /**
+ * Get all terms in the given quad, including nested quads.
+ * @param {BaseQuad} quad An RDFJS quad.
+ * @param {boolean} ignoreDefaultGraph If true and the quad has the default graph as graph,
+ *                                     this term will not be returned in the array.
+ *                                     (default: false)
+ * @return {Term[]} The available terms in the nested quad, excluding quad terms.
+ */
+export function getTermsNested(quad: RDF.BaseQuad, ignoreDefaultGraph?: boolean): RDF.Term[] {
+  const terms: RDF.Term[] = [];
+  for (const term of getTerms(quad, ignoreDefaultGraph)) {
+    if (term.termType === 'Quad') {
+      getTermsNested(term, ignoreDefaultGraph).forEach(subTerm => terms.push(subTerm));
+    } else {
+      terms.push(term);
+    }
+  }
+  return terms;
+}
+
+/**
  * Convert the given quad to an array of named terms.
  * This is the reverse operation of {@link collectNamedTerms}.
  * @param {BaseQuad} quad An RDFJS quad.
@@ -217,11 +237,31 @@ export function someTerms(quad: RDF.BaseQuad,
 }
 
 /**
+ * Check if the given terms match.
+ *
+ * At least one of the following must be true:
+ * * Term B is undefined.
+ * * Term B is a variable.
+ * * Term A and B are quads, and return true for `matchPatternComplete`.
+ * * Quad term and term are equal (`termB.equals(termA)` return true)
+ *
+ * @param termA A term.
+ * @param termB An optional term.
+ */
+export function matchTerm(termA: RDF.Term, termB?: RDF.Term) {
+  return !termB
+    || termB.termType === 'Variable'
+    || (termB.termType === 'Quad' && termA.termType === 'Quad' && matchPatternComplete(termA, termB))
+    || termB.equals(termA);
+}
+
+/**
  * Check if the given quad matches with the given quad terms.
  *
  * Each term must match at least one of the following:
  * * Term is undefined.
  * * Term is a variable.
+ * * Quad term and term are both quads, and return true for `matchPatternComplete`.
  * * Quad term and term are equal (`quadTerm.equals(term)` return true)
  *
  * @param {BaseQuad} quad A quad to match with (can not contain variables).
@@ -233,10 +273,10 @@ export function someTerms(quad: RDF.BaseQuad,
  */
 export function matchPattern(quad: RDF.BaseQuad, subject?: RDF.Term, predicate?: RDF.Term,
                              object?: RDF.Term, graph?: RDF.Term): boolean {
-  return (!subject || subject.termType === 'Variable' || quad.subject.equals(subject))
-    && (!predicate || predicate.termType === 'Variable' || quad.predicate.equals(predicate))
-    && (!object || object.termType === 'Variable' || quad.object.equals(object))
-    && (!graph || graph.termType === 'Variable' || quad.graph.equals(graph));
+  return matchTerm(quad.subject, subject)
+    && matchTerm(quad.predicate, predicate)
+    && matchTerm(quad.object, object)
+    && matchTerm(quad.graph, graph);
 }
 
 /**

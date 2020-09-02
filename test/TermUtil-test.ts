@@ -72,6 +72,31 @@ describe('TermUtil', () => {
           DF.blankNode('a'),
         ]);
     });
+
+    it('should uniqify an array with quads', async () => {
+      return expect(TermUtil.uniqTerms([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.quad(DF.namedNode('s2'), DF.namedNode('p2'), DF.namedNode('o2')),
+      ]))
+        .toEqual([
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+          DF.quad(DF.namedNode('s2'), DF.namedNode('p2'), DF.namedNode('o2')),
+        ]);
+    });
+
+    it('should uniqify an array with nested quads', async () => {
+      return expect(TermUtil.uniqTerms([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.quad(DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.quad(DF.namedNode('s2'), DF.namedNode('p2'), DF.namedNode('o2')),
+      ]))
+        .toEqual([
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+          DF.quad(DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')), DF.namedNode('p1'), DF.namedNode('o1')),
+          DF.quad(DF.namedNode('s2'), DF.namedNode('p2'), DF.namedNode('o2')),
+        ]);
+    });
   });
 
   describe('#getTermsOfType', () => {
@@ -112,6 +137,26 @@ describe('TermUtil', () => {
       expect(TermUtil.getTermsOfType(equalValueMixedTypes, 'DefaultGraph')).toEqual([DF.defaultGraph()]);
       expect(TermUtil.getTermsOfType(equalValueMixedTypesDuplicates, 'DefaultGraph'))
         .toEqual([DF.defaultGraph(), DF.defaultGraph()]);
+    });
+
+    it('should find quads', async () => {
+      expect(TermUtil.getTermsOfType(single, 'Quad')).toEqual([]);
+      expect(TermUtil.getTermsOfType([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+      ], 'Quad')).toEqual([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+      ]);
+      expect(TermUtil.getTermsOfType([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+      ], 'Quad'))
+        .toEqual([
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        ]);
     });
   });
 
@@ -165,12 +210,44 @@ describe('TermUtil', () => {
       expect(TermUtil.getVariables(equalValueMixedTypesDuplicates))
         .toEqual([DF.variable('a'), DF.variable('a')]);
     });
+  });
+
+  describe('#getDefaultGraphs', () => {
+    it('should apply to the empty array', async () => {
+      return expect(TermUtil.getDefaultGraphs(empty)).toEqual([]);
+    });
 
     it('should find default graphs', async () => {
       expect(TermUtil.getDefaultGraphs(single)).toEqual([]);
       expect(TermUtil.getDefaultGraphs(equalValueMixedTypes)).toEqual([DF.defaultGraph()]);
       expect(TermUtil.getDefaultGraphs(equalValueMixedTypesDuplicates))
         .toEqual([DF.defaultGraph(), DF.defaultGraph()]);
+    });
+  });
+
+  describe('#getQuads', () => {
+    it('should apply to the empty array', async () => {
+      return expect(TermUtil.getQuads(empty)).toEqual([]);
+    });
+
+    it('should find default graphs', async () => {
+      expect(TermUtil.getQuads(single)).toEqual([]);
+      expect(TermUtil.getQuads([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+      ])).toEqual([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+      ]);
+      expect(TermUtil.getQuads([
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+        DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        DF.defaultGraph(),
+      ]))
+        .toEqual([
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+          DF.quad(DF.namedNode('s1'), DF.namedNode('p1'), DF.namedNode('o1')),
+        ]);
     });
   });
 });

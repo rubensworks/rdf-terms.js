@@ -33,6 +33,52 @@ describe('QuadTermUtil', () => {
     });
   });
 
+  describe('#getTermsNested', () => {
+    it('should get the terms from a quad', async () => {
+      return expect(QuadTermUtil.getTermsNested(quadNamedNodes))
+        .toEqual([DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')]);
+    });
+
+    it('should get the terms from a quad when the default graph is ignored', async () => {
+      return expect(QuadTermUtil.getTermsNested(quadNamedNodes, true))
+        .toEqual([DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')]);
+    });
+
+    it('should get the terms from a nested quad', async () => {
+      return expect(QuadTermUtil.getTermsNested(
+        DF.quad(
+          DF.quad(DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')),
+          DF.namedNode('p'),
+          DF.namedNode('o'),
+          DF.namedNode('g'),
+        )
+      ))
+        .toEqual([DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')]);
+    });
+
+    it('should get the terms from a deeply nested quad', async () => {
+      return expect(QuadTermUtil.getTermsNested(
+        DF.quad(
+          DF.quad(
+            DF.quad(
+              DF.namedNode('s'),
+              DF.namedNode('p'),
+              DF.namedNode('o'),
+              DF.namedNode('g'),
+            ),
+            DF.namedNode('p'),
+            DF.namedNode('o'),
+            DF.namedNode('g'),
+          ),
+          DF.namedNode('p'),
+          DF.namedNode('o'),
+          DF.namedNode('g'),
+        )
+      ))
+        .toEqual([DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')]);
+    });
+  });
+
   describe('#getNamedTerms', () => {
     it('should get the named terms from a quad', async () => {
       return expect(QuadTermUtil.getNamedTerms(quadNamedNodes))
@@ -437,6 +483,82 @@ describe('QuadTermUtil', () => {
         DF.namedNode('fail'),
         DF.variable('varG'),
       ))).toBeFalsy();
+    });
+
+    const nestedQuadMatch = DF.quad(
+      DF.quad(
+        DF.namedNode('subject-sub'),
+        DF.namedNode('predicate-sub'),
+        DF.namedNode('object-sub'),
+        DF.namedNode('graph-sub'),
+      ),
+      DF.namedNode('predicate'),
+      DF.namedNode('object'),
+      DF.namedNode('graph'),
+    );
+
+    it('a nested quad with variables', async () => {
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.variable('var'),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.quad(
+          DF.namedNode('subject-sub'),
+          DF.namedNode('predicate-sub'),
+          DF.namedNode('object-sub'),
+          DF.namedNode('graph-sub'),
+        ),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.quad(
+          DF.variable('var'),
+          DF.namedNode('predicate-sub'),
+          DF.namedNode('object-sub'),
+          DF.namedNode('graph-sub'),
+        ),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.quad(
+          DF.namedNode('subject-sub'),
+          DF.variable('var'),
+          DF.namedNode('object-sub'),
+          DF.namedNode('graph-sub'),
+        ),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.quad(
+          DF.namedNode('subject-sub'),
+          DF.namedNode('predicate-sub'),
+          DF.variable('var'),
+          DF.namedNode('graph-sub'),
+        ),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
+      expect(QuadTermUtil.matchPatternComplete(nestedQuadMatch, DF.quad(
+        DF.quad(
+          DF.namedNode('subject-sub'),
+          DF.namedNode('predicate-sub'),
+          DF.namedNode('object-sub'),
+          DF.variable('var'),
+        ),
+        DF.namedNode('predicate'),
+        DF.namedNode('object'),
+        DF.namedNode('graph'),
+      ))).toBeTruthy();
     });
   });
 });

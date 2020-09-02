@@ -8,6 +8,7 @@ import {
   getTerms,
   INamedTerm,
   mapTerms,
+  matchTerm,
   matchPattern,
   matchPatternComplete,
   QUAD_TERM_NAMES,

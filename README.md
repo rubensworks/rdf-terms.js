@@ -12,8 +12,10 @@ This package contains utility functions for handling
 
 The following examples assume the following imports:
 ```javascript
-import * as RdfDataModel from "rdf-data-model";
+import { DataFactory } from "rdf-data-factory";
 import * as RdfTerms from "rdf-terms";
+
+const factory = new DataFactory();
 ```
 
 ### Constants
@@ -25,7 +27,7 @@ console.log(RdfTerms.QUAD_TERM_NAMES);
 // Prints [ 'subject', 'predicate', 'object' ]
 console.log(RdfTerms.TRIPLE_TERM_NAMES);
 
-// Prints [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'DefaultGraph' ]
+// Prints [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'DefaultGraph', 'Quad' ]
 console.log(RdfTerms.TERM_TYPES);
 ```
 
@@ -37,7 +39,7 @@ _A second optional parameter can be set to true to ignore graph terms in the def
 
 ```javascript
 // Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g') ]
-RdfTerms.getTerms(RdfDataModel.quad(
+RdfTerms.getTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -45,18 +47,42 @@ RdfTerms.getTerms(RdfDataModel.quad(
 ));
 
 // Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), defaultGraph() ]
-RdfTerms.getTerms(RdfDataModel.triple(
+RdfTerms.getTerms(factory.triple(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
 ));
 
 // Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc') ]
-RdfTerms.getTerms(RdfDataModel.triple(
+RdfTerms.getTerms(factory.triple(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
 ), true);
+```
+
+### Get quad nested terms
+
+Get all nested terms from a quad.
+This means that if a quad's term is a nested term, instead of returning that quad, all nested terms will be included, recursively.
+
+_A second optional parameter can be set to true to ignore graph terms in the default graph._
+
+```javascript
+// Outputs: [ namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g') ]
+RdfTerms.getTerms(factory.quad(
+  factory.quad(
+    namedNode('http://example.org/a'),
+    namedNode('http://example.org/b'),
+    namedNode('http://example.org/c'),
+    namedNode('http://example.org/d'),
+  ),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+));
+
+// Outputs: [ namedNode('http://example.org/a'), namedNode('http://example.org/b'), namedNode('http://example.org/c'), namedNode('http://example.org/d'), namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), defaultGraph() ]
 ```
 
 ### Get named quad terms
@@ -67,7 +93,7 @@ This is the reverse operation from `collectNamedTerms`.
 
 ```javascript
 // Outputs: [ { subject: namedNode('http://example.org/s') }, { predicate: namedNode('http://example.org/p') }, { object: literal('abc') }, { graph: namedNode('http://example.org/g') } ]
-RdfTerms.getNamedTerms(RdfDataModel.quad(
+RdfTerms.getNamedTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -86,29 +112,29 @@ _An second optional callback method can be provided to fill in missing terms_
 ```javascript
 // Outputs: quad(namedNode('http://example.org/s'), namedNode('http://example.org/p'), literal('abc'), namedNode('http://example.org/g'))
 RdfTerms.collectNamedTerms([
-  { subject: RdfDataModel.namedNode('http://example.org/s') },
-  { predicate: RdfDataModel.namedNode('http://example.org/p') },
-  { object: RdfDataModel.literal('abc') },
-  { graph: RdfDataModel.namedNode('http://example.org/g') },
+  { subject: factory.namedNode('http://example.org/s') },
+  { predicate: factory.namedNode('http://example.org/p') },
+  { object: factory.literal('abc') },
+  { graph: factory.namedNode('http://example.org/g') },
 ]);
 
 // Outputs: quad(namedNode('http://example.org/s'), namedNode('http://example.org/newNode'), literal('abc'), namedNode('http://example.org/g'))
 RdfTerms.collectNamedTerms([
-  { subject: RdfDataModel.namedNode('http://example.org/s') },
+  { subject: factory.namedNode('http://example.org/s') },
   // Missing predicate
-  { object: RdfDataModel.literal('abc') },
-  { graph: RdfDataModel.namedNode('http://example.org/g') },
-], (termName) => RdfDataModel.namedNode('http://example.org/newNode'));
+  { object: factory.literal('abc') },
+  { graph: factory.namedNode('http://example.org/g') },
+], (termName) => factory.namedNode('http://example.org/newNode'));
 ```
 
 _An third optional argument can be passed to set a custom data factory_
 
 ```javascript
 RdfTerms.collectNamedTerms([
-  { subject: RdfDataModel.namedNode('http://example.org/s') },
-  { predicate: RdfDataModel.namedNode('http://example.org/p') },
-  { object: RdfDataModel.literal('abc') },
-  { graph: RdfDataModel.namedNode('http://example.org/g') },
+  { subject: factory.namedNode('http://example.org/s') },
+  { predicate: factory.namedNode('http://example.org/p') },
+  { object: factory.literal('abc') },
+  { graph: factory.namedNode('http://example.org/g') },
 ], null, myDataFactory);
 ```
 
@@ -122,7 +148,7 @@ Invokes a callback for each term in the quad.
 // predicate: http://example.org/p
 // object: abc
 // graph: http://example.org/g
-RdfTerms.forEachTerms(RdfDataModel.quad(
+RdfTerms.forEachTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -136,7 +162,7 @@ Returns all quad terms that return true for a given filter.
 
 ```javascript
 // Output: [namedNode('http://example.org/p')]
-RdfTerms.filterTerms(RdfDataModel.quad(
+RdfTerms.filterTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -150,7 +176,7 @@ Returns all quad term names that return true for a given filter.
 
 ```javascript
 // Output: ['predicate']
-RdfTerms.filterQuadTermNames(RdfDataModel.quad(
+RdfTerms.filterQuadTermNames(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -164,7 +190,7 @@ Map all quad terms to form a new quad.
 
 ```javascript
 // Output: quad(namedNode('http://subject'), namedNode('http://predicate'), namedNode('http://object'), namedNode('http://graph'))
-RdfTerms.mapTerms(RdfDataModel.quad(
+RdfTerms.mapTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -176,7 +202,7 @@ _An second optional argument can be passed to set a custom data factory_
 
 ```javascript
 // Output: quad(namedNode('http://subject'), namedNode('http://predicate'), namedNode('http://object'), namedNode('http://graph'))
-RdfTerms.mapTerms(RdfDataModel.quad(
+RdfTerms.mapTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -192,7 +218,7 @@ Reduce the quad terms to a single value.
 
 ```javascript
 // Output: "START: http://example.org/s, http://example.org/p, abc, http://example.org/g"
-RdfTerms.reduceTerms(RdfDataModel.quad(
+RdfTerms.reduceTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -206,7 +232,7 @@ Determines whether all terms satisfy the specified test.
 
 ```javascript
 // Output: false
-RdfTerms.everyTerms(RdfDataModel.quad(
+RdfTerms.everyTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -214,7 +240,7 @@ RdfTerms.everyTerms(RdfDataModel.quad(
 ), (value, key) => value.termType === 'NamedNode');
 
 // Output: true
-RdfTerms.everyTerms(RdfDataModel.quad(
+RdfTerms.everyTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   namedNode('http://example.org/o'),
@@ -228,7 +254,7 @@ Determines whether at least one term satisfies the specified test.
 
 ```javascript
 // Output: true
-RdfTerms.someTerms(RdfDataModel.quad(
+RdfTerms.someTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -236,7 +262,7 @@ RdfTerms.someTerms(RdfDataModel.quad(
 ), (value, key) => value.termType === 'NamedNode');
 
 // Output: true
-RdfTerms.someTerms(RdfDataModel.quad(
+RdfTerms.someTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   namedNode('http://example.org/o'),
@@ -244,12 +270,52 @@ RdfTerms.someTerms(RdfDataModel.quad(
 ), (value, key) => value.termType === 'NamedNode');
 
 // Output: false
-RdfTerms.someTerms(RdfDataModel.quad(
+RdfTerms.someTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   namedNode('http://example.org/o'),
   namedNode('http://example.org/g'),
 ), (value, key) => value.termType === 'Variable');
+```
+
+### Match term
+
+Determines if the given term matches with the given **term**.
+
+```javascript
+// Output: true
+RdfTerms.matchTerm(
+  namedNode('http://example.org/s'),
+  undefined,
+);
+
+// Output: true
+RdfTerms.matchTerm(
+  namedNode('http://example.org/s'),
+  variable('v'),
+);
+
+// Output: true
+RdfTerms.matchTerm(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/s'),
+);
+
+// Output: true
+RdfTerms.matchTerm(
+  factory.quad(
+    namedNode('http://example.org/s'),
+    namedNode('http://example.org/p'),
+    literal('abc'),
+    namedNode('http://example.org/g'),
+  ),
+  factory.quad(
+    namedNode('http://example.org/s'),
+    namedNode('http://example.org/p'),
+    variable('o'),
+    namedNode('http://example.org/g'),
+  ),
+);
 ```
 
 ### Match pattern
@@ -258,7 +324,7 @@ Determines if the given quad matches with the given **quad terms**.
 
 ```javascript
 // Output: true
-RdfTerms.matchPattern(RdfDataModel.quad(
+RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -271,7 +337,7 @@ RdfTerms.matchPattern(RdfDataModel.quad(
 );
 
 // Output: true
-RdfTerms.matchPattern(RdfDataModel.quad(
+RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -282,7 +348,7 @@ RdfTerms.matchPattern(RdfDataModel.quad(
 );
 
 // Output: true
-RdfTerms.matchPattern(RdfDataModel.quad(
+RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -293,8 +359,32 @@ RdfTerms.matchPattern(RdfDataModel.quad(
   literal('abc'),
 );
 
+// Output: true
+RdfTerms.matchPattern(factory.quad(
+  factory.quad(
+    namedNode('http://example.org/a'),
+    namedNode('http://example.org/b'),
+    namedNode('http://example.org/c'),
+    namedNode('http://example.org/d'),
+  ),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+),
+  factory.quad(
+    namedNode('http://example.org/a'),
+    variable('someVariableP'),
+    namedNode('http://example.org/c'),
+    namedNode('http://example.org/d'),
+  ),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+);
+
+
 // Output: false
-RdfTerms.matchPattern(RdfDataModel.quad(
+RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -312,12 +402,12 @@ Determines if the given quad matches with the given **quad pattern** (_A quad th
 
 ```javascript
 // Output: true
-RdfTerms.matchPatternComplete(RdfDataModel.quad(
+RdfTerms.matchPatternComplete(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
   namedNode('http://example.org/g'),
-), RdfDataModel.quad(
+), factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
@@ -325,12 +415,12 @@ RdfTerms.matchPatternComplete(RdfDataModel.quad(
 ));
 
 // Output: true
-RdfTerms.matchPatternComplete(RdfDataModel.quad(
+RdfTerms.matchPatternComplete(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
   namedNode('http://example.org/g'),
-), RdfDataModel.quad(
+), factory.quad(
   namedNode('http://example.org/s'),
   variable('varA'),
   literal('abc'),
@@ -338,12 +428,12 @@ RdfTerms.matchPatternComplete(RdfDataModel.quad(
 ));
 
 // Output: false
-RdfTerms.matchPatternComplete(RdfDataModel.quad(
+RdfTerms.matchPatternComplete(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
   namedNode('http://example.org/g'),
-), RdfDataModel.quad(
+), factory.quad(
   namedNode('http://example.org/s'),
   variable('varA'),
   literal('abcdef'),
