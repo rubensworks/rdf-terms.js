@@ -6,6 +6,7 @@ import {
   forEachTerms,
   getNamedTerms,
   getTerms,
+  getTermsNested,
   INamedTerm,
   mapTerms,
   matchTerm,
