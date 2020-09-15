@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.6.1"></a>
+## [v1.6.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.6.0...v1.6.1) - 2020-09-15
+
+### Fixed
+* [Fix getTermsNested not being exported](https://github.com/rubensworks/rdf-terms.js/commit/2d29484feb127157e5e3135ff91c5fdb35d1229e)
+
 <a name="v1.6.0"></a>
 ## [v1.6.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.5.1...v1.6.0) - 2020-09-02
 
