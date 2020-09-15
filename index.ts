@@ -43,6 +43,7 @@ export {
   QUAD_TERM_NAMES,
   INamedTerm,
   getTerms,
+  getTermsNested,
   getNamedTerms,
   collectNamedTerms,
   forEachTerms,
