@@ -1,6 +1,6 @@
 # RDF Terms
 
-[![Build Status](https://travis-ci.org/rubensworks/rdf-terms.js.svg?branch=master)](https://travis-ci.org/rubensworks/rdf-terms.js)
+[![Build status](https://github.com/rubensworks/rdf-terms.js/workflows/CI/badge.svg)](https://github.com/rubensworks/rdf-terms.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-terms.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-terms.js?branch=master)
 [![Mutation testing badge](https://badge.stryker-mutator.io/github.com/rubensworks/rdf-terms.js/master)](https://stryker-mutator.github.io)
 [![npm version](https://badge.fury.io/js/rdf-terms.svg)](https://www.npmjs.com/package/rdf-terms) 
