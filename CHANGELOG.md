@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.7.0"></a>
+## [v1.7.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.6.2...v1.7.0) - 2021-08-11
+
+### Changed
+* [Migrate to @rdfjs/types](https://github.com/rubensworks/rdf-terms.js/commit/a6b179aca6e6d55ec981909ad77e630ba505352d)
+
 <a name="v1.6.2"></a>
 ## [v1.6.2](https://github.com/rubensworks/rdf-terms.js/compare/v1.6.1...v1.6.2) - 2020-09-15
 
