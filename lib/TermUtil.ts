@@ -1,5 +1,5 @@
 import * as RDF from "@rdfjs/types";
-import { termToString } from 'rdf-string'
+import { termToString } from 'rdf-string';
 
 /**
  * All known term types.
