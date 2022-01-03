@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.7.1"></a>
+## [v1.7.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.7.0...v1.7.1) - 2022-01-03
+
+### Fixed
+* [Remove lodash dependency to fix issues in React, Closes #38](https://github.com/rubensworks/rdf-terms.js/commit/804b33d0b34dcc93bd7df59c91ce3fbf77d68675)
+
 <a name="v1.7.0"></a>
 ## [v1.7.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.6.2...v1.7.0) - 2021-08-11
 
