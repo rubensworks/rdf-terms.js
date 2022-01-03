@@ -1,4 +1,5 @@
 import * as RDF from "@rdfjs/types";
+import { termToString } from 'rdf-string'
 
 /**
  * All known term types.
@@ -17,7 +18,12 @@ export const TERM_TYPES = [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'De
  * @return {T[]} A new array of unique RDFJS terms.
  */
 export function uniqTerms<T extends RDF.Term>(terms: T[]): T[] {
-  return require('lodash.uniqwith')(terms, (termA: RDF.Term, termB: RDF.Term) => termA.equals(termB));
+  const hash: Record<string, boolean> = {};
+
+  return terms.filter(term => {
+    const termString = termToString<RDF.Term>(term);
+    return !(termString in hash) && (hash[termString] = true);
+  })
 }
 
 /**
