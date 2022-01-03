@@ -31,8 +31,8 @@
   ],
   "dependencies": {
     "@rdfjs/types": "*",
-    "lodash.uniqwith": "^4.5.0",
-    "rdf-data-factory": "^1.1.0"
+    "rdf-data-factory": "^1.1.0",
+    "rdf-string": "^1.6.0"
   },
   "devDependencies": {
     "@types/jest": "^27.0.0",
