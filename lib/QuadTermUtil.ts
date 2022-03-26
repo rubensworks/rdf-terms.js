@@ -293,3 +293,33 @@ export function matchPattern(quad: RDF.BaseQuad, subject?: RDF.Term, predicate?:
 export function matchPatternComplete(quad: RDF.BaseQuad, pattern: RDF.BaseQuad): boolean {
   return matchPattern(quad, pattern.subject, pattern.predicate, pattern.object, pattern.graph);
 }
+
+/**
+ * Check if the base quad matches against all terms in the pattern.
+ * 
+ * Each term in the quad must satisfy the following:
+ * * The pattern term is a variable, and all other variables with the same value - map to the same terms in the quad
+ * * Both the quad term and pattern term are quads - and they satisfy the same conditions
+ * * The pattern and quad terms are equal and not variables or quads
+ * 
+ * @param pattern A pattern - possibly containing variables
+ * @param quad A quad - possibly containing variables
+ */
+export function matchBaseQuadPattern(pattern: RDF.BaseQuad, quad: RDF.BaseQuad): boolean {
+  const mapping: Record<string, RDF.Term> = {};
+  function match(_pattern: RDF.BaseQuad, _quad: RDF.BaseQuad): boolean {
+    return everyTerms(_pattern, (term, key) => {
+      switch (term.termType) {
+      case 'Quad':
+        return _quad[key].termType === 'Quad' && match(term, _quad[key] as RDF.BaseQuad);
+      case 'Variable':
+        return term.value in mapping ?
+            mapping[term.value].equals(_quad[key]) :
+            ((mapping[term.value] = _quad[key]) && true);
+      default:
+        return term.equals(_quad[key]);
+      }
+    });
+  }
+  return match(pattern, quad);
+}
