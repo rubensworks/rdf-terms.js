@@ -305,7 +305,7 @@ export function matchPatternComplete(quad: RDF.BaseQuad, pattern: RDF.BaseQuad):
  * @param pattern A pattern - possibly containing variables
  * @param quad A quad - possibly containing variables
  */
-export function matchBaseQuadPattern(pattern: RDF.BaseQuad, quad: RDF.BaseQuad): boolean {
+export function matchPatternMappings(pattern: RDF.BaseQuad, quad: RDF.BaseQuad): boolean {
   const mapping: Record<string, RDF.Term> = {};
   function match(_pattern: RDF.BaseQuad, _quad: RDF.BaseQuad): boolean {
     return everyTerms(_pattern, (term, key) => {

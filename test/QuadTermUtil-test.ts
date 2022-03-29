@@ -13,29 +13,29 @@ describe('QuadTermUtil', () => {
 
   describe('#matchBaseQuadPattern', () => {
     it('Identical terms should always match', () => {
-      expect(QuadTermUtil.matchBaseQuadPattern(quadNamedNodes, quadNamedNodes)).toBeTruthy();
-      expect(QuadTermUtil.matchBaseQuadPattern(quadVariables, quadVariables)).toBeTruthy();
-      expect(QuadTermUtil.matchBaseQuadPattern(quadVariablesAndNamedNodes, quadVariablesAndNamedNodes)).toBeTruthy();
-      expect(QuadTermUtil.matchBaseQuadPattern(tripleNamedNodes, tripleNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariables, quadVariables)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariablesAndNamedNodes, quadVariablesAndNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(tripleNamedNodes, tripleNamedNodes)).toBeTruthy();
     });
     it('Should match all values against all different variables - but not the other way around', () => {
-      expect(QuadTermUtil.matchBaseQuadPattern(quadVariables, quadNamedNodes)).toBeTruthy();
-      expect(QuadTermUtil.matchBaseQuadPattern(quadNamedNodes, quadVariables)).toBeFalsy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariables, quadNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadVariables)).toBeFalsy();
     });
     it('Should not match if the same variables in the pattern do not match the same thing in the quad', () => {
-      expect(QuadTermUtil.matchBaseQuadPattern(
+      expect(QuadTermUtil.matchPatternMappings(
         DF.quad(DF.variable('s'), DF.variable('p'), DF.variable('s'), DF.variable('g')),
         quadNamedNodes)).toBeFalsy();
-      expect(QuadTermUtil.matchBaseQuadPattern(
+      expect(QuadTermUtil.matchPatternMappings(
         DF.quad(DF.variable('s'), DF.variable('p'), DF.variable('s'), DF.variable('g')),
         quadVariables)).toBeFalsy();
     });
     it('Should demonstrate correct behvaior in nested BaseQuads', () => {
-      expect(QuadTermUtil.matchBaseQuadPattern(
+      expect(QuadTermUtil.matchPatternMappings(
           DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
           DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g'))
           )).toBeTruthy();
-      expect(QuadTermUtil.matchBaseQuadPattern(
+      expect(QuadTermUtil.matchPatternMappings(
           DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
           DF.quad(quadVariables, DF.variable('p'), DF.variable('f'), DF.variable('g'))
           )).toBeFalsy();
