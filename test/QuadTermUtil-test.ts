@@ -11,6 +11,39 @@ describe('QuadTermUtil', () => {
   const quadVariablesAndNamedNodes: RDF.Quad = DF.quad(DF.variable('s'), DF.namedNode('p'), DF.variable('o'), DF.namedNode('g'));
   const tripleNamedNodes: RDF.Quad = DF.quad(DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'));
 
+  describe('#matchBaseQuadPattern', () => {
+    it('Identical terms should always match', () => {
+      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariables, quadVariables)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariablesAndNamedNodes, quadVariablesAndNamedNodes)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(tripleNamedNodes, tripleNamedNodes)).toBeTruthy();
+    });
+    it('Should match all values against all different variables - but not the other way around', () => {
+      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadVariables)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadVariables, quadNamedNodes)).toBeFalsy();
+    });
+    it('Should not match if the same variables in the pattern do not match the same thing in the quad', () => {
+      expect(QuadTermUtil.matchPatternMappings(
+        quadNamedNodes,
+        DF.quad(DF.variable('s'), DF.variable('p'), DF.variable('s'), DF.variable('g')),
+      )).toBeFalsy();
+      expect(QuadTermUtil.matchPatternMappings(
+        quadVariables,
+        DF.quad(DF.variable('s'), DF.variable('p'), DF.variable('s'), DF.variable('g')),
+      )).toBeFalsy();
+    });
+    it('Should demonstrate correct behvaior in nested BaseQuads', () => {
+      expect(QuadTermUtil.matchPatternMappings(
+          DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
+          DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g'))
+          )).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(
+          DF.quad(quadVariables, DF.variable('p'), DF.variable('f'), DF.variable('g')),
+          DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
+          )).toBeFalsy();
+    });
+  })
+
   describe('#getTerms', () => {
     it('should get the terms from a quad', async () => {
       return expect(QuadTermUtil.getTerms(quadNamedNodes))

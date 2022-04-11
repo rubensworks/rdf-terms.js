@@ -441,6 +441,54 @@ RdfTerms.matchPatternComplete(factory.quad(
 ));
 ```
 
+### Match pattern, taking into account variable mappings
+
+Determines if the given quad matches with the given **quad pattern** (_A quad that contains zero or more variables)_,
+by taking into account the mappings of the variables.
+If the same variable occurs multiple times in the pattern,
+then the corresponding terms in the quad must be equal.
+
+```javascript
+// Output: true
+RdfTerms.matchPatternMappings(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+));
+
+// Output: true
+RdfTerms.matchPatternComplete(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/X'),
+  literal('abc'),
+  namedNode('http://example.org/X'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  variable('varA'),
+  literal('abc'),
+  variable('varA'),
+));
+
+// Output: false
+RdfTerms.matchPatternComplete(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/X1'),
+  literal('abc'),
+  namedNode('http://example.org/X2'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  variable('varA'),
+  literal('abc'),
+  variable('varA'),
+));
+```
+
 ### Unique terms
 
 Create an array of unique terms from the given array.
