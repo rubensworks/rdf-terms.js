@@ -13,13 +13,14 @@ describe('QuadTermUtil', () => {
 
   describe('#matchBaseQuadPattern', () => {
     it('Identical terms should always match', () => {
-      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadNamedNodes)).toBeTruthy();
-      expect(QuadTermUtil.matchPatternMappings(quadVariables, quadVariables)).toBeTruthy();
-      expect(QuadTermUtil.matchPatternMappings(quadVariablesAndNamedNodes, quadVariablesAndNamedNodes)).toBeTruthy();
-      expect(QuadTermUtil.matchPatternMappings(tripleNamedNodes, tripleNamedNodes)).toBeTruthy();
+      expect<boolean>(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadNamedNodes)).toEqual<boolean>(true);
+      expect<Record<string, RDF.Term> | false>(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadNamedNodes, { returnMappings: true })).toEqual({});
+      expect<boolean>(QuadTermUtil.matchPatternMappings(quadVariables, quadVariables)).toEqual<boolean>(true);
+      expect<boolean>(QuadTermUtil.matchPatternMappings(quadVariablesAndNamedNodes, quadVariablesAndNamedNodes)).toEqual<boolean>(true);
+      expect<boolean>(QuadTermUtil.matchPatternMappings(tripleNamedNodes, tripleNamedNodes)).toEqual<boolean>(true);
     });
     it('Should match all values against all different variables - but not the other way around', () => {
-      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadVariables)).toBeTruthy();
+      expect(QuadTermUtil.matchPatternMappings(quadNamedNodes, quadVariables)).toEqual<boolean>(true);
       expect(QuadTermUtil.matchPatternMappings(quadVariables, quadNamedNodes)).toBeFalsy();
     });
     it('Should not match if the same variables in the pattern do not match the same thing in the quad', () => {
@@ -41,6 +42,11 @@ describe('QuadTermUtil', () => {
           DF.quad(quadVariables, DF.variable('p'), DF.variable('f'), DF.variable('g')),
           DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
           )).toBeFalsy();
+      expect(QuadTermUtil.matchPatternMappings(
+         DF.quad(quadVariables, DF.variable('p'), DF.variable('f'), DF.variable('g')),
+         DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
+         { skipVar: true }
+         )).toBeTruthy();
     });
   })
 
