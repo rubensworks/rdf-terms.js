@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.8.2"></a>
+## [v1.8.2](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.1...v1.8.2) - 2022-05-02
+
+### Fixed
+* [Fix tslib being required, Closes #47](https://github.com/rubensworks/rdf-terms.js/commit/7b082d9483bcfa4bbb8f1cf8e6e2855b0963186a)
+
 <a name="v1.8.1"></a>
 ## [v1.8.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.0...v1.8.1) - 2022-05-02
 
