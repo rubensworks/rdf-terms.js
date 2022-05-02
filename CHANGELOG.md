@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.8.1"></a>
+## [v1.8.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.0...v1.8.1) - 2022-05-02
+
+### Fixed
+* [Export matchPatternMappings from index](https://github.com/rubensworks/rdf-terms.js/commit/0ac59444923b0758e1058f1946a9ddcb46d4fc49)
+
 <a name="v1.8.0"></a>
 ## [v1.8.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.7.1...v1.8.0) - 2022-04-11
 
