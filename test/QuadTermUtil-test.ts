@@ -45,7 +45,7 @@ describe('QuadTermUtil', () => {
       expect(QuadTermUtil.matchPatternMappings(
          DF.quad(quadVariables, DF.variable('p'), DF.variable('f'), DF.variable('g')),
          DF.quad(quadVariables, DF.variable('p'), DF.variable('o'), DF.variable('g')),
-         { skipVar: true }
+         { skipVarMapping: true }
          )).toBeTruthy();
     });
   })
