@@ -489,6 +489,80 @@ RdfTerms.matchPatternComplete(factory.quad(
 ));
 ```
 
+There are also the following optional parameters
+ - `skipVarMapping` - Don't add variables in the quad to the mapping
+ - `returnMappings` - Return the mappings if it is a valid match
+
+```javascript
+// Output: {}
+RdfTerms.matchPatternMappings(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), { returnMappings: true });
+
+// Output: { s: namedNode('http://example.org/s') }
+RdfTerms.matchPatternMappings(factory.quad(
+  variable('s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  literal('abc'),
+  namedNode('http://example.org/g'),
+), { returnMappings: true });
+
+// Output: { s: namedNode('http://example.org/s'), p: variable('o') }
+RdfTerms.matchPatternMappings(factory.quad(
+  variable('s'),
+  namedNode('http://example.org/p'),
+  variable('p'),
+  namedNode('http://example.org/g'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  variable('o'),
+  namedNode('http://example.org/g'),
+), { returnMappings: true });
+
+// Output: { s: namedNode('http://example.org/s') }
+RdfTerms.matchPatternMappings(factory.quad(
+  variable('s'),
+  namedNode('http://example.org/p'),
+  variable('p'),
+  namedNode('http://example.org/g'),
+), factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  variable('o'),
+  namedNode('http://example.org/g'),
+), { returnMappings: true, skipVarMapping: true });
+
+
+const quadVariables = factory.quad(variable('s'), variable('p'), variable('o'), variable('g'));
+
+// Output: False
+RdfTerms.matchPatternMappings(
+  factory.quad(quadVariables, variable('p'), variable('f'), variable('g')),
+  factory.quad(quadVariables, variable('p'), variable('o'), variable('g')),
+)
+
+// Output: True
+RdfTerms.matchPatternMappings(
+  factory.quad(quadVariables, variable('p'), variable('f'), variable('g')),
+  factory.quad(quadVariables, variable('p'), variable('o'), variable('g')),
+  { skipVarMapping: true }
+)
+```
+
 ### Unique terms
 
 Create an array of unique terms from the given array.

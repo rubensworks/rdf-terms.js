@@ -308,7 +308,7 @@ export function matchPatternComplete(quad: RDF.BaseQuad, pattern: RDF.BaseQuad):
  * @param quad A quad - possibly containing variables
  * @param pattern A pattern - possibly containing variables
  * @param options
- *    skipVar - don't add variables in the quad to the mapping
+ *    skipVarMapping - don't add variables in the quad to the mapping
  *    returnMappings - return the mappings if it is a valid match
  */
 export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad): boolean;
