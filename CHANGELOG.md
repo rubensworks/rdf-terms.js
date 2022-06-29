@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.9.0"></a>
+## [v1.9.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.2...v1.9.0) - 2022-06-29
+
+### Added
+* [Add returnMappings and skipVar parameters](https://github.com/rubensworks/rdf-terms.js/commit/8775f372484979ee5b2948dfe555d4327d55770e)
+
 <a name="v1.8.2"></a>
 ## [v1.8.2](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.1...v1.8.2) - 2022-05-02
 
