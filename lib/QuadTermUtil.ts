@@ -307,22 +307,33 @@ export function matchPatternComplete(quad: RDF.BaseQuad, pattern: RDF.BaseQuad):
  *
  * @param quad A quad - possibly containing variables
  * @param pattern A pattern - possibly containing variables
+ * @param options
+ *    skipVarMapping - don't add variables in the quad to the mapping
+ *    returnMappings - return the mappings if it is a valid match
  */
-export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad): boolean {
-  const mapping: Record<string, RDF.Term> = {};
+export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad): boolean;
+export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad, opt: { skipVarMapping?: boolean; returnMappings?: false }): boolean;
+export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad, opt: { skipVarMapping?: boolean; returnMappings: true }): false | Record<string, RDF.Term>;
+export function matchPatternMappings(quad: RDF.BaseQuad, pattern: RDF.BaseQuad, opt: PatternOptions = {}): boolean | Record<string, RDF.Term> {
+  const map: Record<string, RDF.Term> = {};
   function match(_pattern: RDF.BaseQuad, _quad: RDF.BaseQuad): boolean {
-    return everyTerms(_pattern, (term, key) => {
-      switch (term.termType) {
-      case 'Quad':
-        return _quad[key].termType === 'Quad' && match(term, _quad[key] as RDF.BaseQuad);
+    return everyTerms(_pattern, (t1, key) => {
+      const t2 = _quad[key];
+      switch (t1.termType) {
       case 'Variable':
-        return term.value in mapping ?
-            mapping[term.value].equals(_quad[key]) :
-            ((mapping[term.value] = _quad[key]) && true);
+        return (opt.skipVarMapping && t2.termType === 'Variable')
+          || (map[t1.value]?.equals(t2) ?? (map[t1.value] = t2, true));
+      case 'Quad':
+        return t2.termType === 'Quad' && match(t1, t2);
       default:
-        return term.equals(_quad[key]);
+        return t1.equals(t2);
       }
     });
   }
-  return match(pattern, quad);
+  return match(pattern, quad) && (opt.returnMappings ? map : true);
+}
+
+interface PatternOptions {
+  skipVarMapping?: boolean;
+  returnMappings?: boolean;
 }
