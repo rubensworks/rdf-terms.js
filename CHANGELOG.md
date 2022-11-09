@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.9.1"></a>
+## [v1.9.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.9.0...v1.9.1) - 2022-11-09
+
+### Fixed
+* [Include source map files in packed files](https://github.com/rubensworks/rdf-terms.js/commit/e2f40e7eba41d57e5ce8193ca9eeb24c8357c925)
+
 <a name="v1.9.0"></a>
 ## [v1.9.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.8.2...v1.9.0) - 2022-06-29
 
