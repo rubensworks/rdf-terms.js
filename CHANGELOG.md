@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.10.0"></a>
+## [v1.10.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.9.1...v1.10.0) - 2023-06-23
+
+### Added
+* [Add utilities for managing nested terms in quoted triples](https://github.com/rubensworks/rdf-terms.js/commit/969fc9fe6c99607fe179889233f152e51e11cb6a)
+
 <a name="v1.9.1"></a>
 ## [v1.9.1](https://github.com/rubensworks/rdf-terms.js/compare/v1.9.0...v1.9.1) - 2022-11-09
 
