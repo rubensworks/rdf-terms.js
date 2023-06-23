@@ -156,6 +156,30 @@ RdfTerms.forEachTerms(factory.quad(
 ), (value, key) => console.log(key + ': ' + value.value));
 ```
 
+### Iterate over nested quad terms
+
+Invokes a callback for each term in the quad, while recursing into quoted triples.
+
+```javascript
+// Outputs:
+// [subject]: http://example.org/s
+// [predicate]: http://example.org/p
+// [object, subject]: http://example.org/s1
+// [object, predicate]: http://example.org/p1
+// [object, object]: abc
+// [graph]: http://example.org/g
+RdfTerms.forEachTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => console.log(keys + ': ' + value.value));
+```
+
 ### Filter quad terms
 
 Returns all quad terms that return true for a given filter.
@@ -170,6 +194,24 @@ RdfTerms.filterTerms(factory.quad(
 ), (value, key) => key === 'predicate');
 ```
 
+### Filter nested quad terms
+
+Returns all quad terms that return true for a given filter, while recursing into quoted triples.
+
+```javascript
+// Output: [namedNode('http://example.org/p'), namedNode('http://example.org/p1')]
+RdfTerms.filterTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => keys[keys.length - 1] === 'predicate');
+```
+
 ### Filter quad term names
 
 Returns all quad term names that return true for a given filter.
@@ -182,6 +224,24 @@ RdfTerms.filterQuadTermNames(factory.quad(
   literal('abc'),
   namedNode('http://example.org/g'),
 ), (value, key) => value.equals(namedNode('http://example.org/p')));
+```
+
+### Filter nested quad term names
+
+Returns all quad term names that return true for a given filter, while recursing into quoted triples.
+
+```javascript
+// Output: [ ['predicate'], ['object', 'predicate'] ]
+RdfTerms.filterQuadTermNamesNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => value.equals(namedNode('http://example.org/p')));
 ```
 
 ### Map quad terms
@@ -212,6 +272,29 @@ RdfTerms.mapTerms(factory.quad(
   myDataFactory);
 ```
 
+### Map nested quad terms
+
+Map all quad terms to form a new quad, while recursing into quoted triples.
+
+```javascript
+// Output: quad(
+//   namedNode('http://subject'),
+//   namedNode('http://predicate'),
+//   quad(namedNode('http://object-subject'), namedNode('http://object-predicate'), namedNode('http://object-object'), namedNode('http://object-graph')),
+//   namedNode('http://graph'),
+// )
+RdfTerms.mapTerms(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => namedNode('http://' + keys.join('-')));
+```
+
 ### Reduce quad terms
 
 Reduce the quad terms to a single value.
@@ -222,6 +305,24 @@ RdfTerms.reduceTerms(factory.quad(
   namedNode('http://example.org/s'),
   namedNode('http://example.org/p'),
   literal('abc'),
+  namedNode('http://example.org/g'),
+), (previous, value, key) => previous + ', ' + value.value, 'START: ');
+```
+
+### Reduce nested quad terms
+
+Reduce the quad terms to a single value, while recursing into quoted triples.
+
+```javascript
+// Output: "START: http://example.org/s, http://example.org/p, http://example.org/s1, http://example.org/p1, abc, abc, http://example.org/g"
+RdfTerms.reduceTerms(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
   namedNode('http://example.org/g'),
 ), (previous, value, key) => previous + ', ' + value.value, 'START: ');
 ```
@@ -246,6 +347,36 @@ RdfTerms.everyTerms(factory.quad(
   namedNode('http://example.org/o'),
   namedNode('http://example.org/g'),
 ), (value, key) => value.termType === 'NamedNode');
+```
+
+### Every quoted quad terms
+
+Determines whether all terms satisfy the specified test, while recursing into quoted triples.
+
+```javascript
+// Output: false
+RdfTerms.everyTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => value.termType === 'NamedNode');
+
+// Output: true
+RdfTerms.everyTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    namedNode('http://example.org/o1'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => value.termType === 'NamedNode');
 ```
 
 ### Some quad terms
@@ -276,6 +407,36 @@ RdfTerms.someTerms(factory.quad(
   namedNode('http://example.org/o'),
   namedNode('http://example.org/g'),
 ), (value, key) => value.termType === 'Variable');
+```
+
+### Some nested quad terms
+
+Determines whether at least one term satisfies the specified test, while recursing into quoted triples.
+
+```javascript
+// Output: true
+RdfTerms.someTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    literal('abc'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => value.termType === 'Literal');
+
+// Output: false
+RdfTerms.someTermsNested(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    namedNode('http://example.org/o1'),
+  ),
+  namedNode('http://example.org/g'),
+), (value, keys) => value.termType === 'Literal');
 ```
 
 ### Match term

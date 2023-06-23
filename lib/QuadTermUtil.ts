@@ -113,7 +113,7 @@ export function collectNamedTerms<Q extends RDF.BaseQuad = RDF.Quad>(
 }
 
 /**
- * Iterats over each term.
+ * Iterates over each term.
  * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} cb A callback function.
  */
@@ -123,6 +123,37 @@ export function forEachTerms(quad: RDF.BaseQuad,
   cb(quad.predicate, 'predicate');
   cb(quad.object,    'object');
   cb(quad.graph,     'graph');
+}
+
+/**
+ * Iterates over each leaf term, while recursing into quoted triples.
+ * @param {BaseQuad} quad An RDFJS quad.
+ * @param {(value: Term, key: QuadTermName} cb A callback function.
+ * @param QuadTermName[] keys The current key path.
+ */
+export function forEachTermsNested(quad: RDF.BaseQuad,
+                                   cb: (value: RDF.Term, keys: QuadTermName[]) => void,
+                                   keys: QuadTermName[] = []) {
+  if (quad.subject.termType === 'Quad') {
+    forEachTermsNested(quad.subject, cb, [ ...keys, 'subject' ]);
+  } else {
+    cb(quad.subject,   [ ...keys, 'subject' ]);
+  }
+  if (quad.predicate.termType === 'Quad') {
+    forEachTermsNested(quad.predicate, cb, [ ...keys, 'predicate' ]);
+  } else {
+    cb(quad.predicate,   [ ...keys, 'predicate' ]);
+  }
+  if (quad.object.termType === 'Quad') {
+    forEachTermsNested(quad.object, cb, [ ...keys, 'object' ]);
+  } else {
+    cb(quad.object,   [ ...keys, 'object' ]);
+  }
+  if (quad.graph.termType === 'Quad') {
+    forEachTermsNested(quad.graph, cb, [ ...keys, 'graph' ]);
+  } else {
+    cb(quad.graph,   [ ...keys, 'graph' ]);
+  }
 }
 
 /**
@@ -144,6 +175,47 @@ export function filterTerms(quad: RDF.BaseQuad, filter: (value: RDF.Term, key: Q
   }
   if (filter(quad.graph, 'graph')) {
     terms.push(quad.graph);
+  }
+  return terms;
+}
+
+/**
+ * Get all terms in the given quad that return true on the given filter function, while recursing into quoted triples.
+ * @param {BaseQuad} quad A quad.
+ * @param {(value: Term, key: QuadTermName) => boolean} filter A filter callback.
+ * @param QuadTermName[] keys The current key path.
+ * @return {Term[]} The list of matching terms.
+ */
+export function filterTermsNested(quad: RDF.BaseQuad, filter: (value: RDF.Term, keys: QuadTermName[]) => boolean,
+                                  keys: QuadTermName[] = []): RDF.Term[] {
+  let terms: RDF.Term[] = [];
+  if (quad.subject.termType === 'Quad') {
+    terms = [ ...terms, ...filterTermsNested(quad.subject, filter, [ ...keys, 'subject' ]) ];
+  } else {
+    if (filter(quad.subject, [ ...keys, 'subject' ])) {
+      terms.push(quad.subject);
+    }
+  }
+  if (quad.predicate.termType === 'Quad') {
+    terms = [ ...terms, ...filterTermsNested(quad.predicate, filter, [ ...keys, 'predicate' ]) ];
+  } else {
+    if (filter(quad.predicate, [ ...keys, 'predicate' ])) {
+      terms.push(quad.predicate);
+    }
+  }
+  if (quad.object.termType === 'Quad') {
+    terms = [ ...terms, ...filterTermsNested(quad.object, filter, [ ...keys, 'object' ]) ];
+  } else {
+    if (filter(quad.object, [...keys, 'object'])) {
+      terms.push(quad.object);
+    }
+  }
+  if (quad.graph.termType === 'Quad') {
+    terms = [ ...terms, ...filterTermsNested(quad.graph, filter, [ ...keys, 'graph' ]) ];
+  } else {
+    if (filter(quad.graph, [...keys, 'graph'])) {
+      terms.push(quad.graph);
+    }
   }
   return terms;
 }
@@ -173,6 +245,52 @@ export function filterQuadTermNames(quad: RDF.BaseQuad,
 }
 
 /**
+ * Get all quad term names in the given quad that return true on the given filter function, while recursing into quoted triples.
+ * @param {BaseQuad} quad A quad.
+ * @param {(value: Term, key: QuadTermName, all: INamedTerm[]) => boolean} filter A filter callback.
+ * @param QuadTermName[] keys The current key path.
+ * @return {QuadTermName[]} The list of matching quad term names.
+ */
+export function filterQuadTermNamesNested(quad: RDF.BaseQuad,
+                                          filter: (value: RDF.Term, keys: QuadTermName[]) => boolean,
+                                          keys: QuadTermName[] = []): QuadTermName[][] {
+  let names: QuadTermName[][] = [];
+  const keysS: QuadTermName[] = [ ...keys, 'subject' ];
+  if (quad.subject.termType === 'Quad') {
+    names = [ ...names, ...filterQuadTermNamesNested(quad.subject, filter, keysS) ];
+  } else {
+    if (filter(quad.subject, keysS)) {
+      names.push(keysS);
+    }
+  }
+  const keysP: QuadTermName[] = [ ...keys, 'predicate' ];
+  if (quad.predicate.termType === 'Quad') {
+    names = [ ...names, ...filterQuadTermNamesNested(quad.predicate, filter, keysP) ];
+  } else {
+    if (filter(quad.predicate, keysP)) {
+      names.push(keysP);
+    }
+  }
+  const keysO: QuadTermName[] = [ ...keys, 'object' ];
+  if (quad.object.termType === 'Quad') {
+    names = [ ...names, ...filterQuadTermNamesNested(quad.object, filter, keysO) ];
+  } else {
+    if (filter(quad.object, keysO)) {
+      names.push(keysO);
+    }
+  }
+  const keysG: QuadTermName[] = [ ...keys, 'graph' ];
+  if (quad.graph.termType === 'Quad') {
+    names = [ ...names, ...filterQuadTermNamesNested(quad.graph, filter, keysG) ];
+  } else {
+    if (filter(quad.graph, keysG)) {
+      names.push(keysG);
+    }
+  }
+  return names;
+}
+
+/**
  * Map all terms of a quad.
  * @param {Quad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName) => Term} mapper A mapper function.
@@ -188,6 +306,35 @@ export function mapTerms<Q extends RDF.BaseQuad = RDF.Quad>(quad: Q,
     mapper(quad.predicate, 'predicate'),
     mapper(quad.object, 'object'),
     mapper(quad.graph, 'graph'),
+  );
+}
+
+/**
+ * Map all terms of a quad, while recursing into quoted triples.
+ * @param {Quad} quad An RDFJS quad.
+ * @param {(value: Term, key: QuadTermName) => Term} mapper A mapper function.
+ * @param {RDF.DataFactory} dataFactory A custom data factory to create quads.
+ * @param QuadTermName[] keys The current key path.
+ * @return {Quad} A new RDFJS quad.
+ * @template Q The type of quad, defaults to RDF.Quad.
+ */
+export function mapTermsNested<Q extends RDF.BaseQuad = RDF.Quad>(quad: Q,
+                                                                  mapper: (term: RDF.Term, keys: QuadTermName[]) => RDF.Term,
+                                                                  dataFactory?: RDF.DataFactory<Q>,
+                                                                  keys: QuadTermName[] = []): Q {
+  return (dataFactory || <RDF.DataFactory<Q>> <any> DF).quad(
+    quad.subject.termType === 'Quad' ?
+      mapTermsNested(quad.subject, mapper, dataFactory, [ ...keys, 'subject' ]) :
+      mapper(quad.subject, [ ...keys, 'subject' ]),
+    quad.predicate.termType === 'Quad' ?
+      mapTermsNested(quad.predicate, mapper, dataFactory, [ ...keys, 'predicate' ]) :
+      mapper(quad.predicate, [ ...keys, 'predicate' ]),
+    quad.object.termType === 'Quad' ?
+      mapTermsNested(quad.object, mapper, dataFactory, [ ...keys, 'object' ]) :
+      mapper(quad.object, [ ...keys, 'object' ]),
+    quad.graph.termType === 'Quad' ?
+      mapTermsNested(quad.graph, mapper, dataFactory, [ ...keys, 'graph' ]) :
+      mapper(quad.graph, [ ...keys, 'graph' ]),
   );
 }
 
@@ -209,6 +356,42 @@ export function reduceTerms<U>(quad: RDF.BaseQuad,
 }
 
 /**
+ * Reduce all terms of a quad, while recursing into quoted triples.
+ * @param {BaseQuad} quad An RDFJS quad.
+ * @param {(previousValue: U, currentValue: Term, key: QuadTermName) => U} reducer A reduce function.
+ * @param {U} initialValue The initial value.
+ * @param QuadTermName[] keys The current key path.
+ * @return {U} The final value.
+ */
+export function reduceTermsNested<U>(quad: RDF.BaseQuad,
+                                     reducer: (previousValue: U, currentValue: RDF.Term, keys: QuadTermName[]) => U,
+                                     initialValue: U,
+                                     keys: QuadTermName[] = []): U {
+  let value: U = initialValue;
+  if (quad.subject.termType === 'Quad') {
+    value = reduceTermsNested(quad.subject, reducer, value, [ ...keys, 'subject' ]);
+  } else {
+    value = reducer(value, quad.subject,   [ ...keys, 'subject' ]);
+  }
+  if (quad.predicate.termType === 'Quad') {
+    value = reduceTermsNested(quad.predicate, reducer, value, [ ...keys, 'predicate' ]);
+  } else {
+    value = reducer(value, quad.predicate,   [ ...keys, 'predicate' ]);
+  }
+  if (quad.object.termType === 'Quad') {
+    value = reduceTermsNested(quad.object, reducer, value, [ ...keys, 'object' ]);
+  } else {
+    value = reducer(value, quad.object,   [ ...keys, 'object' ]);
+  }
+  if (quad.graph.termType === 'Quad') {
+    value = reduceTermsNested(quad.graph, reducer, value, [ ...keys, 'graph' ]);
+  } else {
+    value = reducer(value, quad.graph,   [ ...keys, 'graph' ]);
+  }
+  return value;
+}
+
+/**
  * Determines whether all terms satisfy the specified test.
  * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} checker A checker function.
@@ -223,6 +406,30 @@ export function everyTerms(quad: RDF.BaseQuad,
 }
 
 /**
+ * Determines whether all terms satisfy the specified test, while recursing into quoted triples.
+ * @param {BaseQuad} quad An RDFJS quad.
+ * @param {(value: Term, key: QuadTermName} checker A checker function.
+ * @param QuadTermName[] keys The current key path.
+ * @return {boolean} If all terms satisfy the specified test.
+ */
+export function everyTermsNested(quad: RDF.BaseQuad,
+                                 checker: (value: RDF.Term, keys: QuadTermName[]) => boolean,
+                                 keys: QuadTermName[] = []): boolean {
+  return (quad.subject.termType === 'Quad' ?
+    everyTermsNested(quad.subject, checker, [ ...keys, 'subject' ]) :
+    checker(quad.subject, [ ...keys, 'subject' ]))
+    && (quad.predicate.termType === 'Quad' ?
+      everyTermsNested(quad.predicate, checker, [ ...keys, 'predicate' ]) :
+      checker(quad.predicate, [ ...keys, 'predicate' ]))
+    && (quad.object.termType === 'Quad' ?
+      everyTermsNested(quad.object, checker, [ ...keys, 'object' ]) :
+      checker(quad.object, [ ...keys, 'object' ]))
+    && (quad.graph.termType === 'Quad' ?
+      everyTermsNested(quad.graph, checker, [ ...keys, 'graph' ]) :
+      checker(quad.graph, [ ...keys, 'graph' ]))
+}
+
+/**
  * Determines whether at least one term satisfies the specified test.
  * @param {BaseQuad} quad An RDFJS quad.
  * @param {(value: Term, key: QuadTermName} checker A checker function.
@@ -234,6 +441,30 @@ export function someTerms(quad: RDF.BaseQuad,
       || checker(quad.predicate, 'predicate')
       || checker(quad.object,    'object')
       || checker(quad.graph,     'graph');
+}
+
+/**
+ * Determines whether at least one term satisfies the specified test, while recursing into quoted triples.
+ * @param {BaseQuad} quad An RDFJS quad.
+ * @param {(value: Term, key: QuadTermName} checker A checker function.
+ * @param QuadTermName[] keys The current key path.
+ * @return {boolean} If at least one term satisfies the specified test.
+ */
+export function someTermsNested(quad: RDF.BaseQuad,
+                                checker: (value: RDF.Term, keys: QuadTermName[]) => boolean,
+                                keys: QuadTermName[] = []): boolean {
+  return (quad.subject.termType === 'Quad' ?
+      someTermsNested(quad.subject, checker, [ ...keys, 'subject' ]) :
+      checker(quad.subject,   [ ...keys, 'subject' ]))
+    || (quad.predicate.termType === 'Quad' ?
+      someTermsNested(quad.predicate, checker, [ ...keys, 'predicate' ]) :
+      checker(quad.predicate,   [ ...keys, 'predicate' ]))
+    || (quad.object.termType === 'Quad' ?
+      someTermsNested(quad.object, checker, [ ...keys, 'object' ]) :
+      checker(quad.object,   [ ...keys, 'object' ]))
+    || (quad.graph.termType === 'Quad' ?
+      someTermsNested(quad.graph, checker, [ ...keys, 'graph' ]) :
+      checker(quad.graph,   [ ...keys, 'graph' ]));
 }
 
 /**
