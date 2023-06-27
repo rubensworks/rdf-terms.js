@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.11.0"></a>
+## [v1.11.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.10.0...v1.11.0) - 2023-06-27
+
+### Added
+* [Add getValueNestedPath](https://github.com/rubensworks/rdf-terms.js/commit/fe7c8a099fa747383705915a88b16f749a803d62)
+
 <a name="v1.10.0"></a>
 ## [v1.10.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.9.1...v1.10.0) - 2023-06-23
 
