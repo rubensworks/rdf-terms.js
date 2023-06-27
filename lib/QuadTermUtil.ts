@@ -468,6 +468,21 @@ export function someTermsNested(quad: RDF.BaseQuad,
 }
 
 /**
+ * Get the nested value inside a quoted triple by the given path of quad keys.
+ * @param term A term, that can be a quoted triple.
+ * @param keys A path of quad term names.
+ */
+export function getValueNestedPath(term: RDF.Term, keys: QuadTermName[]): RDF.Term {
+  if (keys.length === 0) {
+    return term;
+  }
+  if (term.termType === 'Quad') {
+    return getValueNestedPath(term[keys[0]], keys.slice(1));
+  }
+  throw new Error(`Tried to get ${keys[0]} from term of type ${term.termType}`);
+}
+
+/**
  * Check if the given terms match.
  *
  * At least one of the following must be true:

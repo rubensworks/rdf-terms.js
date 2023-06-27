@@ -439,6 +439,28 @@ RdfTerms.someTermsNested(factory.quad(
 ), (value, keys) => value.termType === 'Literal');
 ```
 
+### Get value in nested path
+
+Get the nested value inside a quoted triple by the given path of quad keys.
+
+```javascript
+// Output: literal('abc')
+RdfTerms.getValueNestedPath(factory.quad(
+  namedNode('http://example.org/s'),
+  namedNode('http://example.org/p'),
+  factory.quad(
+    namedNode('http://example.org/s1'),
+    namedNode('http://example.org/p1'),
+    factory.quad(
+      namedNode('http://example.org/s1'),
+      namedNode('http://example.org/p1'),
+      literal('abc'),
+    ),
+  ),
+  namedNode('http://example.org/g'),
+), [ 'object', 'object', 'object' ]);
+```
+
 ### Match term
 
 Determines if the given term matches with the given **term**.

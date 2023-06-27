@@ -676,6 +676,69 @@ describe('QuadTermUtil', () => {
     });
   });
 
+  describe('#getValueNestedPath', () => {
+    it('for an empty path', async () => {
+      expect(QuadTermUtil.getValueNestedPath(DF.namedNode('s'),[]))
+        .toEqual(DF.namedNode('s'));
+      expect(QuadTermUtil.getValueNestedPath(quadNamedNodes,[]))
+        .toEqual(quadNamedNodes);
+    });
+
+    it('for a valid non-empty path', async () => {
+      expect(QuadTermUtil.getValueNestedPath(DF.quad(DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')),['subject']))
+        .toEqual(DF.namedNode('s'));
+      expect(QuadTermUtil.getValueNestedPath(DF.quad(
+        DF.quad(
+          DF.namedNode('s'),
+          DF.namedNode('p'),
+          DF.quad(
+            DF.quad(
+              DF.namedNode('s'),
+              DF.namedNode('TREASURE'),
+              DF.namedNode('o'),
+              DF.namedNode('g'),
+            ),
+            DF.namedNode('p'),
+            DF.namedNode('o'),
+            DF.namedNode('g'),
+          ),
+          DF.namedNode('g'),
+        ),
+        DF.namedNode('p'),
+        DF.namedNode('o'),
+        DF.namedNode('g'),
+      ),['subject', 'object', 'subject', 'predicate']))
+        .toEqual(DF.namedNode('TREASURE'));
+    });
+
+    it('should throw for an invalid path', async () => {
+      expect(() => QuadTermUtil.getValueNestedPath(DF.quad(DF.namedNode('s'), DF.namedNode('p'), DF.namedNode('o'), DF.namedNode('g')),['subject', 'predicate']))
+        .toThrow('Tried to get predicate from term of type NamedNode');
+      expect(() => QuadTermUtil.getValueNestedPath(DF.quad(
+        DF.quad(
+          DF.namedNode('s'),
+          DF.namedNode('p'),
+          DF.quad(
+            DF.quad(
+              DF.namedNode('s'),
+              DF.namedNode('TREASURE'),
+              DF.namedNode('o'),
+              DF.namedNode('g'),
+            ),
+            DF.namedNode('p'),
+            DF.namedNode('o'),
+            DF.namedNode('g'),
+          ),
+          DF.namedNode('g'),
+        ),
+        DF.namedNode('p'),
+        DF.namedNode('o'),
+        DF.namedNode('g'),
+      ),['subject', 'object', 'subject', 'predicate', 'object']))
+        .toThrow('Tried to get object from term of type NamedNode');
+    });
+  });
+
   describe('#matchPattern', () => {
     const quadMatch = DF.quad(
       DF.namedNode('subject'),
