@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.11.0...v2.0.0) - 2025-01-08
+
+### BREAKING CHANGES
+* [Update to rdf-data-factory v2](https://github.com/rubensworks/rdf-terms.js/commit/95d531952faf94ada9a75b59026d580ec37695f3)
+    This includes a bump to @rdfjs/types@2.0.0, which requires TypeScript 5 and Node 14+
+
 <a name="v1.11.0"></a>
 ## [v1.11.0](https://github.com/rubensworks/rdf-terms.js/compare/v1.10.0...v1.11.0) - 2023-06-27
 
