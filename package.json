@@ -40,9 +40,9 @@
     "rdf-string": "^2.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.0.0",
+    "@types/jest": "^30.0.0",
     "coveralls": "^3.0.0",
-    "jest": "^29.0.0",
+    "jest": "^30.0.0",
     "manual-git-changelog": "^1.0.0",
     "pre-commit": "^1.2.2",
     "stryker": "^0.35.0",
