@@ -178,7 +178,7 @@ describe('QuadTermUtil', () => {
         { key: 'predicate', value: DF.namedNode('p') },
         { key: 'object', value: DF.namedNode('o') },
         { key: 'graph', value: DF.namedNode('g') },
-      ], null, DF)).toEqual(quadNamedNodes);
+      ], undefined, DF)).toEqual(quadNamedNodes);
     });
 
     it('should create a triple from named terms', async () => {
@@ -196,7 +196,7 @@ describe('QuadTermUtil', () => {
         { key: 'predicate', value: DF.namedNode('p') },
         { key: 'object', value: DF.namedNode('o') },
         { key: 'graph', value: DF.namedNode('g') },
-      ], () => null)).toEqual(quadNamedNodes);
+      ], () => undefined!)).toEqual(quadNamedNodes);
     });
 
     it('should create a quad from named terms with a callback for a missing subject', async () => {
@@ -231,7 +231,7 @@ describe('QuadTermUtil', () => {
         { key: 'subject', value: DF.namedNode('s') },
         { key: 'predicate', value: DF.namedNode('p') },
         { key: 'object', value: DF.namedNode('o') },
-      ], (termName: QuadTermUtil.QuadTermName) => null)).toEqual(tripleNamedNodes);
+      ], (termName: QuadTermUtil.QuadTermName) => undefined!)).toEqual(tripleNamedNodes);
     });
   });
 
@@ -240,7 +240,9 @@ describe('QuadTermUtil', () => {
       const values = [];
       const keys = [];
       const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName) => {
+        // @ts-ignore
         values.push(value);
+        // @ts-ignore
         keys.push(key);
       });
       QuadTermUtil.forEachTerms(quadNamedNodes, cb);
@@ -253,7 +255,9 @@ describe('QuadTermUtil', () => {
       const values = [];
       const keys = [];
       const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName) => {
+        // @ts-ignore
         values.push(value);
+        // @ts-ignore
         keys.push(key);
       });
       QuadTermUtil.forEachTerms(tripleNamedNodes, cb);
@@ -268,7 +272,9 @@ describe('QuadTermUtil', () => {
       const values = [];
       const keys = [];
       const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName[]) => {
+        // @ts-ignore
         values.push(value);
+        // @ts-ignore
         keys.push(key);
       });
       QuadTermUtil.forEachTermsNested(quadNamedNodes, cb);
@@ -286,7 +292,9 @@ describe('QuadTermUtil', () => {
       const values = [];
       const keys = [];
       const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName[]) => {
+        // @ts-ignore
         values.push(value);
+        // @ts-ignore
         keys.push(key);
       });
       QuadTermUtil.forEachTermsNested(tripleNamedNodes, cb);
@@ -304,7 +312,9 @@ describe('QuadTermUtil', () => {
       const values = [];
       const keys = [];
       const cb = jest.fn((value: RDF.Term, key: QuadTermUtil.QuadTermName[]) => {
+        // @ts-ignore
         values.push(value);
+        // @ts-ignore
         keys.push(key);
       });
       QuadTermUtil.forEachTermsNested(quotedQuadNamedNodes, cb);
@@ -753,7 +763,7 @@ describe('QuadTermUtil', () => {
 
     it('a quad and subject term', async () => {
       expect(QuadTermUtil.matchPattern(quadMatch,
-        null)).toBeTruthy();
+        undefined)).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'))).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
@@ -766,7 +776,7 @@ describe('QuadTermUtil', () => {
 
     it('a quad and subject and predicate term', async () => {
       expect(QuadTermUtil.matchPattern(quadMatch,
-        DF.namedNode('subject'), null)).toBeTruthy();
+        DF.namedNode('subject'), undefined)).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'), DF.namedNode('predicate'))).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
@@ -780,7 +790,7 @@ describe('QuadTermUtil', () => {
     it('a quad and subject, predicate and object term', async () => {
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'), DF.namedNode('predicate'),
-        null)).toBeTruthy();
+        undefined)).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'), DF.namedNode('predicate'),
         DF.namedNode('object'))).toBeTruthy();
@@ -798,7 +808,7 @@ describe('QuadTermUtil', () => {
     it('a quad and subject, predicate, object and graph term', async () => {
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'), DF.namedNode('predicate'),
-        DF.namedNode('object'), null)).toBeTruthy();
+        DF.namedNode('object'), undefined)).toBeTruthy();
       expect(QuadTermUtil.matchPattern(quadMatch,
         DF.namedNode('subject'), DF.namedNode('predicate'),
         DF.namedNode('object'), DF.namedNode('graph'))).toBeTruthy();
