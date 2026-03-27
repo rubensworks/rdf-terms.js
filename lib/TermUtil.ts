@@ -1,4 +1,4 @@
-import * as RDF from "@rdfjs/types";
+import type * as RDF from '@rdfjs/types';
 import { termToString } from 'rdf-string';
 
 /**
@@ -8,9 +8,7 @@ import { termToString } from 'rdf-string';
  */
 export const TERM_TYPES = [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'DefaultGraph', 'Quad' ];
 
-/*
- * Utility methods for handling RDFJS terms.
- */
+// Utility methods for handling RDFJS terms.
 
 /**
  * Create an array of unique terms from the given array.
@@ -20,10 +18,10 @@ export const TERM_TYPES = [ 'NamedNode', 'BlankNode', 'Literal', 'Variable', 'De
 export function uniqTerms<T extends RDF.Term>(terms: T[]): T[] {
   const hash: Record<string, boolean> = {};
 
-  return terms.filter(term => {
+  return terms.filter((term) => {
     const termString = termToString<RDF.Term>(term);
     return !(termString in hash) && (hash[termString] = true);
-  })
+  });
 }
 
 /**
@@ -32,9 +30,10 @@ export function uniqTerms<T extends RDF.Term>(terms: T[]): T[] {
  * @param {"NamedNode" | "BlankNode" | "Literal" | "Variable" | "DefaultGraph" | "Quad"} termType A term type.
  * @return {Term[]} A new array with elements from the given array only containing elements of the given type.
  */
-export function getTermsOfType(terms: RDF.Term[],
-                               termType: "NamedNode" | "BlankNode" | "Literal" | "Variable" | "DefaultGraph" | "Quad")
-: RDF.Term[] {
+export function getTermsOfType(
+  terms: RDF.Term[],
+  termType: 'NamedNode' | 'BlankNode' | 'Literal' | 'Variable' | 'DefaultGraph' | 'Quad',
+): RDF.Term[] {
   return terms.filter((term: RDF.Term) => term.termType === termType);
 }
 

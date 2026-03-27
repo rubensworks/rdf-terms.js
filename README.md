@@ -3,7 +3,7 @@
 [![Build status](https://github.com/rubensworks/rdf-terms.js/workflows/CI/badge.svg)](https://github.com/rubensworks/rdf-terms.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/rubensworks/rdf-terms.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/rdf-terms.js?branch=master)
 [![Mutation testing badge](https://badge.stryker-mutator.io/github.com/rubensworks/rdf-terms.js/master)](https://stryker-mutator.github.io)
-[![npm version](https://badge.fury.io/js/rdf-terms.svg)](https://www.npmjs.com/package/rdf-terms) 
+[![npm version](https://badge.fury.io/js/rdf-terms.svg)](https://www.npmjs.com/package/rdf-terms)
 
 This package contains utility functions for handling
 [RDFJS](https://github.com/rdfjs/representation-task-force/) terms of quads/triples.
@@ -565,7 +565,6 @@ RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/g'),
 );
 
-
 // Output: false
 RdfTerms.matchPattern(factory.quad(
   namedNode('http://example.org/s'),
@@ -728,7 +727,6 @@ RdfTerms.matchPatternMappings(factory.quad(
   variable('o'),
   namedNode('http://example.org/g'),
 ), { returnMappings: true, skipVarMapping: true });
-
 
 const quadVariables = factory.quad(variable('s'), variable('p'), variable('o'), variable('g'));
 
