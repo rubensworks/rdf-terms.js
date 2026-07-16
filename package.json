@@ -64,7 +64,7 @@
     "stryker-jest-runner": "^1.2.1",
     "stryker-typescript": "^0.18.0",
     "ts-jest": "^29.0.0",
-    "typescript": "^6.0.0"
+    "typescript": "^7.0.0"
   },
   "jest": {
     "globals": {
